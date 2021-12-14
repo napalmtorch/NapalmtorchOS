@@ -44,7 +44,7 @@ void mm_init()
     mm_info.data_end    = mm_usable_end;
     mm_info.data_length = mm_info.data_end - mm_info.data_base;
     mm_info.data_used   = 0;
-    memset((void*)mm_info.data_base, 0, mm_info.data_length);
+    //memset((void*)mm_info.data_base, 0, mm_info.data_length);
 
     // create mass entry
     mm_create_entry(mm_info.data_base, mm_info.data_length, MEMSTATE_FREE);

@@ -25,7 +25,6 @@
 #include <kernel/system/cli.h>
 
 extern uint32_t kernel_size;
-extern spinlock_t lock;
 
 void kernel_entry();
 void kernel_boot();

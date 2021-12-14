@@ -16,10 +16,14 @@ typedef struct
 void CMD_METHOD_CLS(char* input, char** argv, int argc);
 void CMD_METHOD_HELP(char* input, char** argv, int argc);
 void CMD_METHOD_THREADS(char* input, char** argv, int argc);
+void CMD_METHOD_KILL(char* input, char** argv, int argc);
+void CMD_METHOD_CPUINFO(char* input, char** argv, int argc);
 
 static const cli_cmd_t CMD_CLS          = { "CLS", "Clear the screen", "cls [color]", CMD_METHOD_CLS };
 static const cli_cmd_t CMD_HELP         = { "HELP", "Show list of commands", "help [-u : usage, -s : shortened]", CMD_METHOD_HELP };
 static const cli_cmd_t CMD_THREADS      = { "THREADS", "Show list of threads", "threads", CMD_METHOD_THREADS };
+static const cli_cmd_t CMD_KILL         = { "KILL", "Terminate thread with specified id", "kill [id]", CMD_METHOD_KILL };
+static const cli_cmd_t CMD_CPUINFO      = { "CPUINFO", "Show processor information", "cpuinfo", CMD_METHOD_CPUINFO };
 
 void   cli_init();
 void   cli_register_defaults();

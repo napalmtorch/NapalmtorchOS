@@ -5,7 +5,6 @@ extern uint32_t stack_top;
 extern uint32_t stack_bottom;
 
 // threading information
-thread_t*  thread_current;
 uint32_t   thread_cid = 0;
 
 void thread_exit();
@@ -17,7 +16,7 @@ thread_t* thread_initial()
     thread->id = thread_cid++;
     thread->stack = &stack_top;
     thread->stack_size = &stack_top - &stack_bottom;
-    thread_current = thread;
+    thread->registers.eflags = 0x200;
     return thread;
 }
 
@@ -62,6 +61,7 @@ void thread_monitor(thread_t* thread)
     thread->time.time = pit_get_seconds_total();
     if (thread->time.time != thread->time.last_time)
     {
+        thread->time.tps_old = thread->time.ticks_per_second;
         thread->time.seconds_total++;
         thread->time.ticks_per_second = thread->time.ticks;
         thread->time.ticks = 0;

@@ -7,6 +7,7 @@ uint8_t         kbps2_scancode;
 bool_t          kbps2_vga_output;
 void            (*kbps2_enter_event)(bytestream_t* stream);
 uint8_t*        kbps2_keymap;
+spinlock_t      kbps2_lock;
 
 bool_t kbps2_lshift, kbps2_rshift, kbps2_caps;
 bool_t kbps2_lctrl;
@@ -42,9 +43,7 @@ void kbps2_init()
 
 void kbps2_callback(registers_t* regs)
 {
-    spinlock_t lock;
     tlock();
-    spinlock_lock(&lock);
 
     // get status
     uint8_t status = port_inb(0x64);
@@ -59,7 +58,6 @@ void kbps2_callback(registers_t* regs)
     kbps2_handle_scancode(kbps2_scancode);
 
     tunlock();
-    spinlock_unlock(&lock);
 }
 
 void kbps2_handle_scancode(uint8_t code)

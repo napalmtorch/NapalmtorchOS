@@ -1,15 +1,13 @@
 [GLOBAL switch_thread]
-[EXTERN taskmgr_current]
-[EXTERN taskmgr_next]
+[EXTERN current_thread]
 
 ; perform context switch of threads
 switch_thread:
     cli
 
     ; load current thread into eax
-    mov eax, [taskmgr_current]
-    ;mov eax, [eax]
-    xchg bx, bx
+    mov eax, [current_thread]
+    mov eax, [eax]
 
     ; save general purpose registers to current thread
     mov [eax+0],  esp
@@ -26,9 +24,12 @@ switch_thread:
     pop ecx
     mov [eax+32], ecx
 
+    ; load next thread from argument into eax
+    mov eax, [esp+4]
+
     ; load next thread into current thread
-    mov eax, [taskmgr_next]
-    ;mov eax, [eax]
+    mov [current_thread], eax
+    mov eax, [eax]
     
     ; restore general purpose registers of next thread
     mov esp, [eax+0]

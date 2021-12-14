@@ -9,6 +9,9 @@ thread_t* thread_kernel;
 thread_t* thread_idle;
 uint32_t  kernel_time, kernel_timelast;
 
+spinlock_t kernel_lock;
+spinlock_t idle_lock;
+
 int idle_main(thread_t* thread);
 
 // entry point from bootstrap assembly
@@ -86,13 +89,14 @@ void kernel_before_run()
 
 void kernel_run()
 {
+    tlock();
     cli_monitor();
     thread_monitor(thread_kernel);
 
     kernel_time = pit_get_seconds_total();
     if (kernel_time != kernel_timelast)
     {
-        tlock();
+        //spinlock_lock(&kernel_lock);
         kernel_timelast = kernel_time;
         taskmgr_calculate_cpu_usage();
         //sysinfo_print_info();
@@ -112,11 +116,14 @@ void kernel_run()
         strcat(str_itps, ltoa(thread_idle->time.ticks_per_second, temp, 10));
 
         // print string values
+        vga_putstr(0, vga_get_height() - 1, "                                    ", COL4_WHITE, COL4_DARKBLUE);
+        vga_putstr(0, vga_get_height() - 2, "                                    ", COL4_WHITE, COL4_DARKBLUE);
         vga_putstr(0, vga_get_height() - 1, str_ktps, COL4_WHITE, COL4_DARKBLUE);
         vga_putstr(0, vga_get_height() - 2, str_itps, COL4_WHITE, COL4_DARKBLUE);
 
-       tunlock();
+        //spinlock_unlock(&kernel_lock);
     }
+    tunlock();
 }
 
 // idle thread method
@@ -124,7 +131,11 @@ int idle_main(thread_t* thread)
 {
     while (TRUE)
     {
+        tlock();
+        //spinlock_lock(&idle_lock);
         thread_monitor(thread);
+        //spinlock_unlock(&idle_lock);
+        tunlock();
     }
     return 0;
 }
