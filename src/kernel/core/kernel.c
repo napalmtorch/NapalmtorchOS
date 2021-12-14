@@ -80,7 +80,7 @@ void kernel_before_run()
 void kernel_run()
 {
     kernel_ticks++;
-    kernel_time = pit_get_seconds();
+    kernel_time = pit_get_seconds_total();
     if (kernel_time != kernel_timelast)
     {
         tlock();
@@ -123,7 +123,7 @@ int idle_main(void* args)
     while (TRUE)
     {
         idle_ticks++;
-        time = pit_get_seconds();
+        time = pit_get_seconds_total();
         if (time != last_time)
         {
             last_time  = time;
