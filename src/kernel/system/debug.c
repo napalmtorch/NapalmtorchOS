@@ -144,7 +144,13 @@ int debug_vprintf(const char* str, va_list args)
                     debug_write(strhex(num, str, FALSE, 4));
                 }
             }
-            else if (*str == 'f') { /* TODO : implement float to string */ }
+            else if (*str == 'f')
+            {
+                double num = va_arg(args, double);
+                char str[32];
+                memset(str, 0, 32);
+                debug_write(ftoa(num, str, 2));
+            }
             else if (*str == 's')
             {
                 char* val = va_arg(args, char*);

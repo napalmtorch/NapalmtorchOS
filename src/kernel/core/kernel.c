@@ -84,6 +84,7 @@ void kernel_run()
     {
         tlock();
         kernel_timelast = kernel_time;
+        taskmgr_calculate_cpu_usage();
         sysinfo_print_info();
 
         // create and clear strings on stack
@@ -117,6 +118,9 @@ int idle_main(thread_t* thread)
     }
     return 0;
 }
+
+thread_t* kernel_get_thread() { return thread_kernel; }
+thread_t* idle_get_thread() { return thread_idle; }
 
 uint32_t kernel_address_start() { return (uint32_t)&kernel_start; }
 uint32_t kernel_address_end() { return (uint32_t)&kernel_end; }

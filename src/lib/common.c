@@ -91,10 +91,42 @@ int toupper(int c)
     return c;
 }
 
+void strrevl(char* str, int len)
+{
+    int i = 0, j = len - 1, temp;
+    while (i < j) 
+    {
+        temp = str[i];
+        str[i] = str[j];
+        str[j] = temp;
+        i++;
+        j--;
+    }
+}
+
+int int2str(int x, char str[], int d)
+{
+    int i = 0;
+    while (x) { str[i++] = (x % 10) + '0'; x = x / 10; }
+    while (i < d) { str[i++] = '0'; }
+    strrevl(str, i);
+    str[i] = '\0';
+    return i;
+}
+
 
 char* ftoa(float num, char* str, int afterpoint)
 {
-
+    int ipart = (int)num;
+    float fpart = num - (float)ipart;
+    int i = int2str(ipart, str, 0);
+    if (afterpoint != 0)
+    {
+        str[i] = '.';
+        fpart = fpart * powd(10.0f, afterpoint);
+        int2str((int)fpart, str + i + 1, afterpoint);
+    }
+    return str;
 }
 
 char* itoa(int num, char* str, int base)

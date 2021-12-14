@@ -240,7 +240,10 @@ int vga_vprintf(const char* str, va_list args)
             }
             else if (*str == 'f')
             {
-                /* TODO : implement float to string */
+                double num = va_arg(args, double);
+                char str[32];
+                memset(str, 0, 32);
+                vga_write(ftoa(num, str, 2));
             }
             else if (*str == 's')
             {

@@ -21,7 +21,8 @@ typedef struct
     uint32_t ticks, ticks_per_second;
     uint64_t ticks_total;
     uint32_t seconds_total;
-    uint32_t time, last_time;  
+    uint32_t time, last_time;
+    double   cpu_usage;
 } PACKED thread_time_t;
 
 typedef struct

@@ -3,6 +3,7 @@
 #include <lib/memory.h>
 #include <lib/string.h>
 #include <lib/common.h>
+#include <lib/math.h>
 #include <kernel/graphics/color.h>
 #include <kernel/core/multiboot.h>
 #include <kernel/hardware/interrupts/descriptors.h>
@@ -25,6 +26,9 @@ void kernel_entry();
 void kernel_boot();
 void kernel_before_run();
 void kernel_run();
+
+thread_t* kernel_get_thread();
+thread_t* idle_get_thread();
 
 uint32_t kernel_address_start();
 uint32_t kernel_address_end();

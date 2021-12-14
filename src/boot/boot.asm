@@ -24,7 +24,6 @@ mboot:
     dd start
 
 section .bss
-align 4096
 stack_bottom:
     resb 4 * 1024 * 1024
 stack_top:

@@ -45,4 +45,8 @@ void sysinfo_print_info()
     vga_printf("%d MB ", mm_amount_free() / 1024 / 1024); 
     vga_set_cursor_x(34);
     vga_set_fg(COL4_GRAY); vga_printf("(%d bytes)         \n", mm_amount_free()); vga_set_fg(0x0F);
+
+    vga_write_fg("CPU Usage        :       ", COL4_YELLOW);
+    vga_printf("%f", taskmgr_get_cpu_usage());
+    vga_writeln("%");
 }

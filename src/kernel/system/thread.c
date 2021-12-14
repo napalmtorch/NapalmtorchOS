@@ -1,6 +1,9 @@
 #include <kernel/system/thread.h>
 #include <kernel/core/kernel.h>
 
+extern uint32_t stack_top;
+extern uint32_t stack_bottom;
+
 // threading information
 thread_t*  thread_current;
 uint32_t   thread_cid = 0;
@@ -12,6 +15,8 @@ thread_t* thread_initial()
 {
     thread_t* thread = calloc(sizeof(thread_t));
     thread->id = thread_cid++;
+    thread->stack = &stack_top;
+    thread->stack_size = &stack_top - &stack_bottom;
     thread_current = thread;
     return thread;
 }
