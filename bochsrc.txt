@@ -1,0 +1,9 @@
+megs: 1024
+plugin_ctrl: unmapped=true, biosdev=true, speaker=true, extfpuirq=true, parallel=true, serial=true
+display_library: x, options="gui_debug"
+ata0-master:  type=cdrom, path="napalm_os.iso", status=inserted
+boot: cdrom
+log: bochsout.txt
+magic_break: enabled=1
+vga: extension=vbe, update_freq=5, realtime=1
+clock: sync=none, time0=local, rtc_sync=0
