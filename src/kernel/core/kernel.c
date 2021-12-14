@@ -20,7 +20,6 @@ void kernel_entry(uint32_t* mboot_ptr)
     // boot sequence
     kernel_boot();
     kernel_before_run();
-    sysinfo_print_info();
 
     // main loop
     while (TRUE)
@@ -47,6 +46,9 @@ void kernel_boot()
     mboot_read();
     mm_init();
 
+    // initialize service manager
+    service_initmgr();
+
     // initialize vga interface
     vga_init();
 
@@ -70,13 +72,21 @@ void kernel_before_run()
     // load idle thread
     thread_idle = thread_create(&idle_main, 8192);
 
+    // initialize keyboard
+    kbps2_init();
+    kbps2_toggle_vga_output(TRUE);
+    
+    cli_init();
+    cli_print_caret();
+
     // start task manager and enable interrupts
     taskmgr_start();
-    asm volatile("sti");
+    sti();
 }
 
 void kernel_run()
 {
+    cli_monitor();
     thread_monitor(thread_kernel);
 
     kernel_time = pit_get_seconds_total();
@@ -85,7 +95,7 @@ void kernel_run()
         tlock();
         kernel_timelast = kernel_time;
         taskmgr_calculate_cpu_usage();
-        sysinfo_print_info();
+        //sysinfo_print_info();
 
         // create and clear strings on stack
         char str_ktps[64];
@@ -105,7 +115,7 @@ void kernel_run()
         vga_putstr(0, vga_get_height() - 1, str_ktps, COL4_WHITE, COL4_DARKBLUE);
         vga_putstr(0, vga_get_height() - 2, str_itps, COL4_WHITE, COL4_DARKBLUE);
 
-        tunlock();
+       tunlock();
     }
 }
 

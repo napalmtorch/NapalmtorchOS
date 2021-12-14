@@ -53,6 +53,16 @@ do
     echo "$cmsgl$cdir$inf$cmsgm$outdir$outf$cmsge"
 done
 
+# ----------------------------------------------- SYSTEMCOMMANDS ------------------------------------------------------------
+cdir="src/kernel/system/commands/"
+for file in $cdir*.c
+do
+    inf="$(basename $file)"
+    outf="$(echo ${inf%.*}.o)"
+    i686-elf-gcc -w -Iinclude -c "$cdir$inf" -o "$outdir$outf" -nostdlib -ffreestanding -Wall -Wextra
+    echo "$cmsgl$cdir$inf$cmsgm$outdir$outf$cmsge"
+done
+
 # ----------------------------------------------- LIB ------------------------------------------------------------
 cdir="src/lib/"
 for file in $cdir*.c
@@ -85,6 +95,16 @@ done
 
 # ----------------------------------------------- HARDWARE/DEVICES/VIDEO ------------------------------------------------
 cdir="src/kernel/hardware/devices/video/"
+for file in $cdir*.c
+do
+    inf="$(basename $file)"
+    outf="$(echo ${inf%.*}.o)"
+    i686-elf-gcc -w -Iinclude -c "$cdir$inf" -o "$outdir$outf" -nostdlib -ffreestanding -Wall -Wextra
+    echo "$cmsgl$cdir$inf$cmsgm$outdir$outf$cmsge"
+done
+
+# ----------------------------------------------- HARDWARE/DEVICES/INPUT ------------------------------------------------
+cdir="src/kernel/hardware/devices/input/"
 for file in $cdir*.c
 do
     inf="$(basename $file)"

@@ -2,11 +2,27 @@
 #include <lib/types.h>
 #include <kernel/system/thread.h>
 
+#define SPINLOCK_LOCKED 0
+#define SPINLOCK_UNLOCKED 1
+
 typedef struct thread_list
 {
     thread_t* thread;
     struct thread_list* next;
 } PACKED thread_list_t;
+
+typedef volatile uint32_t spinlock_t;
+
+typedef struct semaphore
+{
+  uint32_t counter;
+  spinlock_t lock;
+  thread_list_t queue;
+} semaphore_t;
+
+void spinlock_lock (spinlock_t *lock);
+
+void spinlock_unlock (spinlock_t *lock);
 
 extern thread_list_t* current_thread;
 

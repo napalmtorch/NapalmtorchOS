@@ -69,8 +69,17 @@ void vga_delete()
     if (!vga_info.initialized) { return; }
 
     // not yet implemented - am lazy
-    if (vga_info.cursor_x > 0) { }
-    else if (vga_info.cursor_y > 0) { }
+    if (vga_info.cursor_x > 0)
+    {
+        vga_info.cursor_x--;
+        vga_putchar(vga_info.cursor_x, vga_info.cursor_y, 0x20, vga_info.fore_color, vga_info.back_color);
+    }
+    else if (vga_info.cursor_y > 0)
+    {
+        vga_info.cursor_x = vga_info.width - 1;
+        vga_info.cursor_y--;
+        vga_putchar(vga_info.cursor_x, vga_info.cursor_y, 0x20, vga_info.fore_color, vga_info.back_color);
+    }
 
     // update vga screen cursor
     vga_update_cursor();

@@ -115,7 +115,7 @@ uint8_t rtc_get_reg(uint16_t reg)
 {
     cli();
     port_outb(RTC_PORT_CMD, reg);
-    asm volatile("sti");
+    sti();
     return port_inb(RTC_PORT_DATA);
 }
 

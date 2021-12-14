@@ -369,6 +369,7 @@ void errorf(EXCEPTION code, const char* str, ...)
 // kernel panic with exception code and specified registers
 void panic(EXCEPTION code, registers_t* regs)
 {
+    cli();
     error(code);
     if (regs != NULL) { debug_dumpregs(regs, debug_mode); } else { debug_dumpregs_raw(debug_mode); }
     debug_halt();
@@ -377,6 +378,7 @@ void panic(EXCEPTION code, registers_t* regs)
 // kernel panic with interrupt exception code and specified registers
 void panici(IEXCEPTION code, registers_t* regs)
 {
+    cli();
     debug_header("  !!  ", 0x0C);
     debug_writeln(IEXCEPTION_MSGS[code]);
     if (regs != NULL) { debug_dumpregs(regs, debug_mode); } else { debug_dumpregs_raw(debug_mode); }
@@ -386,6 +388,7 @@ void panici(IEXCEPTION code, registers_t* regs)
 // kernel panic with exception code, specified registers, and formatted string
 void panicf(EXCEPTION code, registers_t* regs, const char* str, ...)
 {
+    cli();
     va_list args;
     va_start(args, str);
     error(code);

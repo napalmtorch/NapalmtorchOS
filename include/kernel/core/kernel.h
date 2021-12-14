@@ -3,6 +3,7 @@
 #include <lib/memory.h>
 #include <lib/string.h>
 #include <lib/common.h>
+#include <lib/stream.h>
 #include <lib/math.h>
 #include <kernel/graphics/color.h>
 #include <kernel/core/multiboot.h>
@@ -14,13 +15,17 @@
 #include <kernel/hardware/common/pit.h>
 #include <kernel/hardware/common/rtc.h>
 #include <kernel/hardware/devices/video/vga.h>
+#include <kernel/hardware/devices/input/keyboard_ps2.h>
 #include <kernel/system/debug.h>
 #include <kernel/system/memmgr.h>
 #include <kernel/system/taskmgr.h>
 #include <kernel/system/thread.h>
 #include <kernel/system/sysinfo.h>
+#include <kernel/system/service.h>
+#include <kernel/system/cli.h>
 
 extern uint32_t kernel_size;
+extern spinlock_t lock;
 
 void kernel_entry();
 void kernel_boot();

@@ -101,22 +101,36 @@ irq_common_stub:
     iretd               ; return from interrupt
 .end:
 
+global ts_common_stub:function ts_common_stub.end-ts_common_stub
 ts_common_stub:
     pushad              ; push general purpose registers
 
     mov AX, DS          ; load data segment into ax
     push EAX            ; push data segment stored in ax
 
+    mov AX, 0x10        ; load segment value into ax
+    mov DS, AX          ; load segment into ds
+    mov ES, AX          ; load segment into es
+    mov FS, AX          ; load segment into fs
+    mov GS, AX          ; load segment into gs
+    mov SS, AX          ; load segment into ss
+
     push ESP            ; push register struct pointer as argument
     call pit_handler    ; call isr handler method
     add ESP, 4          ; pop register struct
     
     pop EBX             ; pop segment register
-    mov DS, BX          ; restore ds register
+    mov DS, BX          ; restore ds segment
+    mov ES, BX          ; restore es segment
+    mov FS, BX          ; restore fs segment
+    mov GS, BX          ; restore gs segment
+    mov SS, BX          ; restore ss segment
+
     popad               ; pop general purpose registers
 
     add ESP, 8          ; pop error code and interrupt number
     iretd               ; return from interrupt
+.end:
 
 global isr0
 global isr1
