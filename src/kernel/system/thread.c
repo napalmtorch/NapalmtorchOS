@@ -17,7 +17,7 @@ thread_t* thread_initial()
 }
 
 // create new thread with specified entry pointer, stack size, and arguments pointer
-thread_t* thread_create(thread_entry_t entry, uint32_t stack_size, void* arg)
+thread_t* thread_create(thread_entry_t entry, uint32_t stack_size)
 {
     thread_t* thread = calloc(sizeof(thread_t));
     memset(thread, 0, sizeof(thread_t));
@@ -28,7 +28,7 @@ thread_t* thread_create(thread_entry_t entry, uint32_t stack_size, void* arg)
 
     uint32_t* s = ((uint32_t)thread->stack + (stack_size - 16));
 
-    *--s = (uint32_t)arg;
+    *--s = (uint32_t)thread;
     *--s = (uint32_t)&thread_exit;
     *--s = (uint32_t)entry;
 
@@ -45,4 +45,21 @@ void thread_exit()
 {
     debug_info("Thread exited");
     while (TRUE);
+}
+
+// monitor thread and update time values
+void thread_monitor(thread_t* thread)
+{
+    if (thread == NULL) { panicf(EXCEPTION_NULLPTR, NULL, "thread_monitor"); return; }
+
+    thread->time.ticks++;
+    thread->time.ticks_total++;
+    thread->time.time = pit_get_seconds_total();
+    if (thread->time.time != thread->time.last_time)
+    {
+        thread->time.seconds_total++;
+        thread->time.ticks_per_second = thread->time.ticks;
+        thread->time.ticks = 0;
+        thread->time.last_time = thread->time.time;
+    }
 }

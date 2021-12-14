@@ -7,10 +7,9 @@ uint32_t kernel_size;
 uint32_t mboot_start;
 thread_t* thread_kernel;
 thread_t* thread_idle;
-uint32_t  kernel_ticks, kernel_time, kernel_timelast, kernel_tps;
-uint32_t  idle_tps;
+uint32_t  kernel_time, kernel_timelast;
 
-int idle_main(void* arg);
+int idle_main(thread_t* thread);
 
 // entry point from bootstrap assembly
 void kernel_entry(uint32_t* mboot_ptr)
@@ -62,7 +61,6 @@ void kernel_before_run()
     thread_kernel   = thread_initial();
 
     // reset timing information
-    kernel_ticks    = 0;
     kernel_time     = UINT32_MAX;
     kernel_timelast = 0;
 
@@ -70,7 +68,7 @@ void kernel_before_run()
     taskmgr_init(thread_kernel);
 
     // load idle thread
-    thread_idle = thread_create(&idle_main, 8192, NULL);
+    thread_idle = thread_create(&idle_main, 8192);
 
     // start task manager and enable interrupts
     taskmgr_start();
@@ -79,17 +77,13 @@ void kernel_before_run()
 
 void kernel_run()
 {
-    kernel_ticks++;
+    thread_monitor(thread_kernel);
+
     kernel_time = pit_get_seconds_total();
     if (kernel_time != kernel_timelast)
     {
         tlock();
-
-        // update timing information
         kernel_timelast = kernel_time;
-        kernel_tps = kernel_ticks;
-        kernel_ticks = 0;
-
         sysinfo_print_info();
 
         // create and clear strings on stack
@@ -102,9 +96,9 @@ void kernel_run()
 
         // build strings
         strcat(str_ktps, "KERNEL TPS: ");
-        strcat(str_ktps, ltoa(kernel_tps, temp, 10));
+        strcat(str_ktps, ltoa(thread_kernel->time.ticks_per_second, temp, 10));
         strcat(str_itps, "IDLE TPS:   ");
-        strcat(str_itps, ltoa(idle_tps, temp, 10));
+        strcat(str_itps, ltoa(thread_idle->time.ticks_per_second, temp, 10));
 
         // print string values
         vga_putstr(0, vga_get_height() - 1, str_ktps, COL4_WHITE, COL4_DARKBLUE);
@@ -115,21 +109,11 @@ void kernel_run()
 }
 
 // idle thread method
-int idle_main(void* args)
+int idle_main(thread_t* thread)
 {
-    idle_tps = 0;
-
-    uint32_t time = 0, last_time = 0, idle_ticks = 0;
     while (TRUE)
     {
-        idle_ticks++;
-        time = pit_get_seconds_total();
-        if (time != last_time)
-        {
-            last_time  = time;
-            idle_tps   = idle_ticks;
-            idle_ticks = 0;
-        }
+        thread_monitor(thread);
     }
     return 0;
 }
