@@ -1,63 +1,81 @@
 #include <kernel/system/debug.h>
 #include <kernel/core/kernel.h>
 
+// current debugging modes
 DEBUGMODE debug_mode;
 DEBUGMODE debug_mode_last;
 
+// set current debugging mode
 void debug_setmode(DEBUGMODE mode) 
 { 
+    // save current mode
     debug_mode_last = debug_mode;
+
+    // set current mode
     debug_mode = mode; 
 }
 
+// return the last debugging mode
 void debug_lastmode() { debug_setmode(debug_mode_last); }
 
+// get the current debugging mode
 DEBUGMODE debug_getmode() { return debug_mode; }
 
-void debug_halt() { asm volatile("cli; hlt"); }
+// disable interrupts and halt execution
+void debug_halt() { cli(); hlt(); }
 
+// bochs breakpoint
 void debug_breakpoint() { asm volatile("xchgw %bx, %bx"); }
 
+// check if debugging mode supports terminal output
 bool_t debug_isterm() { return (debug_mode == DEBUGMODE_TERM) || (debug_mode == DEBUGMODE_ALL); }
 
+// check if debugging mode supports serial output
 bool_t debug_isserial() { return (debug_mode == DEBUGMODE_SERIAL) || (debug_mode == DEBUGMODE_ALL); }
 
+// generate new line
 void debug_newline()
 {
     if (debug_isserial()) { serial_newline(); }
     if (debug_isterm()) { vga_newline(); }
 }
 
+// write character
 void debug_writechar(char c)
 {
     if (debug_isserial()) { serial_writechar(c); }
     if (debug_isterm()) { vga_writechar(c); }
 }
 
+// write string
 void debug_write(const char* str)
 {
     if (debug_isserial()) { serial_write(str); }
     if (debug_isterm()) { vga_write(str); }
 }
 
+// write string with specified fore color
 void debug_write_col(const char* str, uint8_t color)
 {
     if (debug_isserial()) { serial_write_col(str, color); }
     if (debug_isterm()) { vga_write_fg(str, color); }
 }
 
+// write line
 void debug_writeln(const char* str)
 {
     if (debug_isserial()) { serial_writeln(str); }
     if (debug_isterm()) { vga_writeln(str); }
 }
 
+// write line with specified fore color
 void debug_writeln_col(const char* str, uint8_t color)
 {
     if (debug_isserial()) { serial_writeln_col(str, color); }
     if (debug_isterm()) { vga_writeln_fg(str, color); }
 }
 
+// write formatted text with manually specified arguments
 int debug_vprintf(const char* str, va_list args)
 {
     DEBUGMODE old_mode = debug_getmode();
@@ -126,10 +144,7 @@ int debug_vprintf(const char* str, va_list args)
                     debug_write(strhex(num, str, FALSE, 4));
                 }
             }
-            else if (*str == 'f')
-            {
-                /* TODO : implement float to string */
-            }
+            else if (*str == 'f') { /* TODO : implement float to string */ }
             else if (*str == 's')
             {
                 char* val = va_arg(args, char*);
@@ -149,6 +164,7 @@ int debug_vprintf(const char* str, va_list args)
     debug_setmode(old_mode);
 }
 
+// print formatted string
 int debug_printf(const char* str, ...)
 {
     va_list args;
@@ -157,6 +173,7 @@ int debug_printf(const char* str, ...)
     va_end(args);
 }
 
+// print debug message header
 void debug_header(const char* str, uint8_t color)
 {
     debug_write("[");
@@ -164,6 +181,7 @@ void debug_header(const char* str, uint8_t color)
     debug_write("] ");
 }
 
+// print debug message header and formatted string
 void debug_headerf(const char* hstr, uint8_t color, const char* str, va_list args)
 {
     DEBUGMODE old_mode = debug_getmode();
@@ -173,6 +191,7 @@ void debug_headerf(const char* hstr, uint8_t color, const char* str, va_list arg
     debug_setmode(old_mode);
 }
 
+// print formatted ok message
 void debug_ok(const char* str, ...)
 {
     va_list args;
@@ -181,6 +200,7 @@ void debug_ok(const char* str, ...)
     va_end(args);
 }
 
+// print formatted info message
 void debug_info(const char* str, ...)
 {
     va_list args;
@@ -189,6 +209,7 @@ void debug_info(const char* str, ...)
     va_end(args);
 }
 
+// print formatted warning message
 void debug_warn(const char* str, ...)
 {
     va_list args;
@@ -197,6 +218,7 @@ void debug_warn(const char* str, ...)
     va_end(args);
 }
 
+// print formatted error message
 void debug_error(const char* str, ...)
 {
     va_list args;
@@ -205,6 +227,7 @@ void debug_error(const char* str, ...)
     va_end(args);
 }
 
+// dump specified amount of memory at pointer
 void debug_dumpmem(uint8_t* ptr, uint32_t size, DEBUGMODE mode)
 {
     DEBUGMODE old = debug_getmode();
@@ -253,6 +276,7 @@ void debug_dumpmem(uint8_t* ptr, uint32_t size, DEBUGMODE mode)
     debug_setmode(old);
 }
 
+// print registers struct
 void debug_dumpregs(registers_t* regs, DEBUGMODE mode)
 {
     DEBUGMODE old = debug_getmode();
@@ -284,6 +308,7 @@ void debug_dumpregs(registers_t* regs, DEBUGMODE mode)
     debug_setmode(old);
 }
 
+// print registers read directly
 void debug_dumpregs_raw(DEBUGMODE mode)
 {
     register uint32_t ebp asm("ebp");
@@ -319,12 +344,14 @@ void debug_dumpregs_raw(DEBUGMODE mode)
     debug_setmode(old);
 }
 
+// print error with exception code
 void error(EXCEPTION code)
 {
     debug_header("  !!  ", 0x0C);
     debug_writeln(EXCEPTION_MSGS[code]);
 }
 
+// print error with exception code and formatted string
 void errorf(EXCEPTION code, const char* str, ...)
 {
     va_list args;
@@ -333,6 +360,7 @@ void errorf(EXCEPTION code, const char* str, ...)
     va_end(args);
 }
 
+// kernel panic with exception code and specified registers
 void panic(EXCEPTION code, registers_t* regs)
 {
     error(code);
@@ -340,6 +368,7 @@ void panic(EXCEPTION code, registers_t* regs)
     debug_halt();
 }
 
+// kernel panic with interrupt exception code and specified registers
 void panici(IEXCEPTION code, registers_t* regs)
 {
     debug_header("  !!  ", 0x0C);
@@ -348,6 +377,7 @@ void panici(IEXCEPTION code, registers_t* regs)
     debug_halt();
 }
 
+// kernel panic with exception code, specified registers, and formatted string
 void panicf(EXCEPTION code, registers_t* regs, const char* str, ...)
 {
     va_list args;

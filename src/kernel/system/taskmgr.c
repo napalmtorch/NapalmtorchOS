@@ -5,6 +5,7 @@ thread_list_t* ready_queue;
 thread_list_t* current_thread;
 bool_t         taskmgr_ready;
 
+// initialize task management interface with initial thread
 void taskmgr_init(thread_t* init_thread)
 {
     current_thread = (thread_list_t*)calloc(sizeof(thread_list_t));
@@ -14,8 +15,10 @@ void taskmgr_init(thread_t* init_thread)
     taskmgr_ready          = FALSE;
 }
 
+// allow task switching to happen
 void taskmgr_start() { taskmgr_ready = TRUE; }
 
+// mark thread as ready and add to linked list
 void taskmgr_ready_thread(thread_t* thread)
 {
     thread_list_t* item = (thread_list_t*)calloc(sizeof(thread_list_t));
@@ -31,6 +34,7 @@ void taskmgr_ready_thread(thread_t* thread)
     }
 }
 
+// mark thread as not ready and remove from linked list
 void taskmgr_unready_thread(thread_t* thread)
 {
     thread_list_t* iterator = ready_queue;
@@ -54,31 +58,30 @@ void taskmgr_unready_thread(thread_t* thread)
     }
 }
 
-void tlock()
-{
-    current_thread->thread->locked = TRUE;
-}
+// lock current thread
+void tlock() { current_thread->thread->locked = TRUE; }
 
-void tunlock()
-{
-    current_thread->thread->locked = FALSE;
-}
+// unlock current thread
+void tunlock() { current_thread->thread->locked = FALSE; }
 
+// update current thread and perform context switch
 void taskmgr_schedule()
 {
+    // validate
     if (!taskmgr_ready) { return; }
     if (!ready_queue) { return; }
+
+    // check if current thread is locked
     if (current_thread->thread->locked) { return; }
 
+    // iterate through linked list
     thread_list_t *iterator = ready_queue;
     while (iterator->next) { iterator = iterator->next; }
-
     iterator->next = current_thread;
-
     current_thread->next = 0;
+
+    // switch to new thread
     thread_list_t* new_thread = ready_queue;
-
     ready_queue = ready_queue->next;
-
     switch_thread(new_thread);
 }

@@ -1,122 +1,122 @@
+; global methods
 [GLOBAL gdt_flush]
 [GLOBAL idt_flush]
+
+; external methods from c
 [EXTERN isr_handler]
 [EXTERN irq_handler]
 [EXTERN pit_handler]
 [EXTERN taskmgr_schedule]
 
+; flush gdt and setup segment registers
 gdt_flush:
-    mov EAX, [ESP+4]
-    lgdt [EAX]
+    mov EAX, [ESP+4]    ; load table pointer into eax
+    lgdt [EAX]          ; load table
 
-    mov AX, 0x10
-    mov DS, AX
-    mov ES, AX
-    mov ES, AX
-    mov FS, AX
-    mov GS, AX
-    mov SS, AX
+    mov AX, 0x10        ; load segment value into ax
+    mov DS, AX          ; load segment into ds
+    mov ES, AX          ; load segment into es
+    mov FS, AX          ; load segment into fs
+    mov GS, AX          ; load segment into gs
+    mov SS, AX          ; load segment into ss
+
+    ; finished flushing - far jump return
     jmp 0x08:.gdt_flush_end
 .gdt_flush_end:
     ret
 
 idt_flush:
-    mov EAX, [ESP+4]
-    lidt [EAX]
+    mov EAX, [ESP+4]    ; load table pointer into eax
+    lidt [EAX]          ; load table
 
-    mov AX, 0x10
-    mov DS, AX
-    mov ES, AX
-    mov ES, AX
-    mov FS, AX
-    mov GS, AX
-    mov SS, AX
+    mov AX, 0x10        ; load segment value into ax
+    mov DS, AX          ; load segment into ds
+    mov ES, AX          ; load segment into es
+    mov FS, AX          ; load segment into fs
+    mov GS, AX          ; load segment into gs
+    mov SS, AX          ; load segment into ss
+
+    ; finished flushing - far jump return
     jmp 0x08:.idt_flush_end
 .idt_flush_end:
     ret
 
 global isr_common_stub:function isr_common_stub.end-isr_common_stub
 isr_common_stub:
-    pushad
+    pushad              ; push general purpose registers
 
-    mov ax, ds
-    push eax
+    mov AX, DS          ; load data segment into ax
+    push EAX            ; push data segment stored in ax
 
-    mov ax, 0x10
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-    mov ss, ax
+    mov AX, 0x10        ; load segment value into ax
+    mov DS, AX          ; load segment into ds
+    mov ES, AX          ; load segment into es
+    mov FS, AX          ; load segment into fs
+    mov GS, AX          ; load segment into gs
+    mov SS, AX          ; load segment into ss
 
-    push esp
-    call isr_handler
-    add esp, 4
+    push ESP            ; push register struct pointer as argument
+    call isr_handler    ; call isr handler method
+    add ESP, 4          ; pop register struct
 
-    pop ebx
-    mov ds, bx
-    mov es, bx
-    mov fs, bx
-    mov gs, bx
-    mov ss, bx
+    pop EBX             ; pop segment register
+    mov DS, BX          ; restore ds segment
+    mov ES, BX          ; restore es segment
+    mov FS, BX          ; restore fs segment
+    mov GS, BX          ; restore gs segment
+    mov SS, BX          ; restore ss segment
 
-    popad
-    add esp, 8
-    iretd
+    popad               ; pop general purpose registers
+    add ESP, 8          ; pop error code and interrupt number
+    iretd               ; return from interrupt
 .end:
 
 global irq_common_stub:function irq_common_stub.end-irq_common_stub
 irq_common_stub:
-    pushad
+    pushad              ; push general purpose registers
 
-    mov ax, ds
-    push eax
+    mov AX, DS          ; load data segment into ax
+    push EAX            ; push data segment stored in ax
 
-    mov ax, 0x10
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-    mov ss, ax
+    mov AX, 0x10        ; load segment value into ax
+    mov DS, AX          ; load segment into ds
+    mov ES, AX          ; load segment into es
+    mov FS, AX          ; load segment into fs
+    mov GS, AX          ; load segment into gs
+    mov SS, AX          ; load segment into ss
 
-    push esp
-    call irq_handler
-    add esp, 4
+    push ESP            ; push register struct pointer as argument
+    call irq_handler    ; call isr handler method
+    add ESP, 4          ; pop register struct
 
-    pop ebx
-    mov ds, bx
-    mov es, bx
-    mov fs, bx
-    mov gs, bx
-    mov ss, bx
+    pop EBX             ; pop segment register
+    mov DS, BX          ; restore ds segment
+    mov ES, BX          ; restore es segment
+    mov FS, BX          ; restore fs segment
+    mov GS, BX          ; restore gs segment
+    mov SS, BX          ; restore ss segment
 
-    popad
-    add esp, 8
-    iretd
+    popad               ; pop general purpose registers
+    add ESP, 8          ; pop error code and interrupt number
+    iretd               ; return from interrupt
 .end:
 
 ts_common_stub:
-    pushad
+    pushad              ; push general purpose registers
+
+    mov AX, DS          ; load data segment into ax
+    push EAX            ; push data segment stored in ax
+
+    push ESP            ; push register struct pointer as argument
+    call pit_handler    ; call isr handler method
+    add ESP, 4          ; pop register struct
     
-    mov ax, ds
-    push eax
+    pop EBX             ; pop segment register
+    mov DS, BX          ; restore ds register
+    popad               ; pop general purpose registers
 
-    push esp
-    call pit_handler
-    add esp, 4
-    pop ebx
-    mov ds, bx
-    popad
-
-    add esp, 8
-    iretd
-
-
-; pit
-irq0:
-    push dword 0
-    push dword 0
-	jmp ts_common_stub
+    add ESP, 8          ; pop error code and interrupt number
+    iretd               ; return from interrupt
 
 global isr0
 global isr1
@@ -352,6 +352,13 @@ isr31:
     push dword 31
     jmp isr_common_stub
 
+; 32: PIT - used for thread switching
+irq0:
+    push dword 0
+    push dword 0
+	jmp ts_common_stub
+
+; 33: PS/2 Keyboard
 irq1:
 	push dword 1
 	push dword 33
@@ -387,6 +394,7 @@ irq7:
 	push dword 39
 	jmp irq_common_stub
 
+; RTC
 irq8:
 	push dword 8
 	push dword 40

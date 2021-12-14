@@ -31,6 +31,7 @@ typedef void (*isr_t)(registers_t*);
 
 static inline void cli() { asm volatile("cli"); }
 static inline void sti() { asm volatile("sti"); }
+static inline void hlt() { asm volatile("hlt"); }
 
 void irq_register(uint8_t num, isr_t callback);
 void irq_unregister(uint8_t num);

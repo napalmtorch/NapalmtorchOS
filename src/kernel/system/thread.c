@@ -1,11 +1,13 @@
 #include <kernel/system/thread.h>
 #include <kernel/core/kernel.h>
 
+// threading information
 thread_t*  thread_current;
 uint32_t   thread_cid = 0;
 
 void thread_exit();
 
+// generate kernel thread using current registers
 thread_t* thread_initial()
 {
     thread_t* thread = calloc(sizeof(thread_t));
@@ -14,6 +16,7 @@ thread_t* thread_initial()
     return thread;
 }
 
+// create new thread with specified entry pointer, stack size, and arguments pointer
 thread_t* thread_create(thread_entry_t entry, uint32_t stack_size, void* arg)
 {
     thread_t* thread = calloc(sizeof(thread_t));
@@ -37,8 +40,9 @@ thread_t* thread_create(thread_entry_t entry, uint32_t stack_size, void* arg)
     return thread;
 }
 
+// on thread exit
 void thread_exit()
 {
     debug_info("Thread exited");
-    for (;;);
+    while (TRUE);
 }

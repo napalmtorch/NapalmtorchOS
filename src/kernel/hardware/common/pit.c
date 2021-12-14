@@ -1,15 +1,22 @@
 #include <kernel/hardware/common/pit.h>
 
+// pit ports
 #define PIT_CMD  0x43
 #define PIT_DATA 0x40
 
+// current pit frequency
 uint32_t pit_freq;
+
+// pit time values
 uint32_t pit_millis;
 uint32_t pit_millis_total;
 uint64_t pit_ticks;
-uint32_t pit_timer;
 uint32_t pit_secs;
 
+// timer
+uint32_t pit_timer;
+
+// initialize programmable interval timer at specified frequency
 void pit_init(uint32_t freq)
 {
     // set frequency variable
@@ -30,11 +37,10 @@ void pit_init(uint32_t freq)
     debug_ok("Initialized PIT at %d Hz", pit_freq);
 }
 
-void pit_disable()
-{
-    
-}
+// disable programmable interval timer - not yet implemented
+void pit_disable() { }
 
+// calculate time using pit interrupt
 void pit_calculate()
 {
     pit_ticks++;
@@ -55,12 +61,17 @@ void pit_calculate()
     }
 }
 
+// get current pit frequency
 uint32_t pit_get_freq() { return pit_freq; }
 
-uint32_t pit_get_seconds() { return pit_secs; }
+// get total pit seconds
+uint32_t pit_get_seconds_total() { return pit_secs; }
 
+// get current pit milliseconds
 uint32_t pit_get_millis() { return pit_millis; }
 
+// get total pit milliseconds
 uint32_t pit_get_millis_total() { return pit_millis_total; }
 
+// get total pit ticks
 uint64_t pit_get_ticks() { return pit_ticks; }
