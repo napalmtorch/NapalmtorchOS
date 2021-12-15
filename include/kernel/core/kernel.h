@@ -18,6 +18,7 @@
 #include <kernel/hardware/devices/video/vga.h>
 #include <kernel/hardware/devices/video/vesa.h>
 #include <kernel/hardware/devices/input/keyboard_ps2.h>
+#include <kernel/hardware/devices/storage/ata_pio.h>
 #include <kernel/system/debug.h>
 #include <kernel/system/memmgr.h>
 #include <kernel/system/taskmgr.h>
@@ -26,6 +27,10 @@
 #include <kernel/system/service.h>
 #include <kernel/system/terminal.h>
 #include <kernel/system/cli.h>
+#include <kernel/filesys/filesys.h>
+#include <kernel/filesys/vfs.h>
+#include <kernel/runtime/runtime_exec.h>
+#include <kernel/runtime/runtime_mem.h>
 
 extern uint32_t kernel_size;
 

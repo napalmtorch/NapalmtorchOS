@@ -1,6 +1,12 @@
 #pragma once
 #include <lib/types.h>
 #include <kernel/hardware/interrupts/interrupts.h>
+#include <kernel/runtime/runtime_exec.h>
+
+#define SPINLOCK_LOCKED 0
+#define SPINLOCK_UNLOCKED 1
+
+typedef volatile uint32_t spinlock_t;
 
 typedef enum
 {
@@ -33,7 +39,10 @@ typedef struct
     uint32_t      stack_size;
     THREADSTATE   state;
     thread_time_t time;
+    spinlock_t    lock;
+    runtime_t*    runtime;
     char          name[64];
+    uint32_t      exit_code;
 } PACKED thread_t;
 
 extern void switch_thread();

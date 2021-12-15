@@ -2,11 +2,6 @@
 #include <lib/types.h>
 #include <kernel/system/thread.h>
 
-#define SPINLOCK_LOCKED 0
-#define SPINLOCK_UNLOCKED 1
-
-typedef volatile uint32_t spinlock_t;
-
 void   taskmgr_init(thread_t* init_thread);
 void   taskmgr_start();
 void   taskmgr_ready_thread(thread_t* thread);

@@ -33,16 +33,17 @@ thread_t* thread_create(const char* name, thread_entry_t entry, uint32_t stack_s
     thread->stack = calloc(stack_size);
     thread->stack_size = stack_size;
     thread->state = THREADSTATE_HALTED;
+    thread->runtime = NULL;
 
     uint32_t* s = ((uint32_t)thread->stack + (stack_size - 16));
 
     *--s = (uint32_t)thread;
     *--s = (uint32_t)arg;
-    *--s = (uint32_t)&thread_exit;
+    *--s = (uint32_t)thread_exit;
     *--s = (uint32_t)entry;
 
     thread->registers.esp    = (uint32_t)s;
-    thread->registers.ebp    = 0;
+    thread->registers.ebp    = 0; //(uint32_t)thread->stack + thread->stack_size;
     thread->registers.eflags = 0x200;
     debug_info("Created thread: ID = %d, ESP: 0x%8x, ENTRY: 0x%8x", thread->id, thread->registers.esp, (uint32_t)entry);
     return thread;
@@ -51,9 +52,13 @@ thread_t* thread_create(const char* name, thread_entry_t entry, uint32_t stack_s
 // on thread exit
 void thread_exit(thread_t* thread)
 {
-    register uint32_t code asm ("eax");
-    term_printf("Thread %d exited with code %d\n", thread->id, code);
+    cli();
+    spinlock_lock(&thread->lock);
+    register int code asm ("eax");
+    thread->exit_code = code;
     thread->state = THREADSTATE_TERMINATED;
+    spinlock_unlock(&thread->lock);
+    sti();
     while (TRUE);
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 #include <lib/types.h>
 #include <kernel/system/debug.h>
+#include <kernel/system/thread.h>
 
 #define MEMSTATE_FREE      0
 #define MEMSTATE_USED      1
@@ -29,10 +30,11 @@ typedef struct
 
 typedef struct
 {
-    uint32_t size_bytes;
-    uint32_t size;
-    uint16_t state;
-    void*    ptr;
+    uint32_t  size_bytes;
+    uint32_t  size;
+    thread_t* thread;
+    uint16_t  state;
+    void*     ptr;
 } PACKED heap_entry_t;
 
 typedef struct

@@ -50,6 +50,26 @@ do
     echo "$cmsgl$cdir$inf$cmsgm$outdir$outf$cmsge"
 done
 
+# ----------------------------------------------- RUNTIME --------------------------------------------------------------
+cdir="src/kernel/runtime/"
+for file in $cdir*.c
+do
+    inf="$(basename $file)"
+    outf="$(echo ${inf%.*}.o)"
+    i686-elf-gcc -w -Iinclude -c "$cdir$inf" -o "$outdir$outf" -nostdlib -ffreestanding -Wall -Wextra
+    echo "$cmsgl$cdir$inf$cmsgm$outdir$outf$cmsge"
+done
+
+# ----------------------------------------------- FILESYS --------------------------------------------------------------
+cdir="src/kernel/filesys/"
+for file in $cdir*.c
+do
+    inf="$(basename $file)"
+    outf="$(echo ${inf%.*}.o)"
+    i686-elf-gcc -w -Iinclude -c "$cdir$inf" -o "$outdir$outf" -nostdlib -ffreestanding -Wall -Wextra
+    echo "$cmsgl$cdir$inf$cmsgm$outdir$outf$cmsge"
+done
+
 # ----------------------------------------------- GRAPHICS ------------------------------------------------------------
 cdir="src/kernel/graphics/"
 for file in $cdir*.c
@@ -71,8 +91,18 @@ do
 done
 
 
-# ----------------------------------------------- SYSTE/MCOMMANDS ------------------------------------------------------------
+# ----------------------------------------------- SYSTEM/COMMANDS ------------------------------------------------------------
 cdir="src/kernel/system/commands/"
+for file in $cdir*.c
+do
+    inf="$(basename $file)"
+    outf="$(echo ${inf%.*}.o)"
+    i686-elf-gcc -w -Iinclude -c "$cdir$inf" -o "$outdir$outf" -nostdlib -ffreestanding -Wall -Wextra
+    echo "$cmsgl$cdir$inf$cmsgm$outdir$outf$cmsge"
+done
+
+# ----------------------------------------------- SYSTEM/COMMANDS/FILESYS ------------------------------------------------------------
+cdir="src/kernel/system/commands/filesys/"
 for file in $cdir*.c
 do
     inf="$(basename $file)"
@@ -131,6 +161,17 @@ do
     echo "$cmsgl$cdir$inf$cmsgm$outdir$outf$cmsge"
 done
 
+# ----------------------------------------------- HARDWARE/DEVICES/STORAGE ------------------------------------------------
+cdir="src/kernel/hardware/devices/storage/"
+for file in $cdir*.c
+do
+    inf="$(basename $file)"
+    outf="$(echo ${inf%.*}.o)"
+    i686-elf-gcc -w -Iinclude -c "$cdir$inf" -o "$outdir$outf" -nostdlib -ffreestanding -Wall -Wextra
+    echo "$cmsgl$cdir$inf$cmsgm$outdir$outf$cmsge"
+done
+
+
 # Link message
 linkmsg="Linking boot.o "
 for file in bin/objs/*.o
@@ -153,4 +194,4 @@ grub-mkrescue -o  'napalm_os.iso' 'bin/isodir'
 cp 'napalm_os.iso' 'napalm_os_flp.img'
 
 # Run QEMU instance of operating system
-qemu-system-i386 -m 1024M -vga std -cdrom 'napalm_os.iso' -serial stdio -boot d -soundhw ac97 -enable-kvm -rtc base=localtime -cpu host
+qemu-system-i386 -m 1024M -vga std -hda 'hdd.img' -cdrom 'napalm_os.iso' -serial stdio -boot d -soundhw ac97 -enable-kvm -rtc base=localtime -cpu host

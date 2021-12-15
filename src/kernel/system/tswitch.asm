@@ -19,7 +19,6 @@ switch_thread:
     mov [eax+20], edx
     mov [eax+24], esi
     mov [eax+28], edi
-    xchg bx, bx
     
     ; save eflags to current thread
     pushf
@@ -49,7 +48,6 @@ switch_thread:
     sti
 
     ; return to next thread which will be popped from next thread stack
-    xchg bx, bx
     ret
 
     

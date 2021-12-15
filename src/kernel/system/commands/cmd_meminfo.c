@@ -1,23 +1,8 @@
-#include <kernel/system/sysinfo.h>
+#include <kernel/system/cli.h>
 #include <kernel/core/kernel.h>
 
-const char* OS_NAME         = "Napalm OS";
-const char* OS_VERSION      = "Version 0.3";
-const char* OS_DEV_STATUS   = "Alpha";
-
-const char* sysinfo_get_name() { return OS_NAME; }
-const char* sysinfo_get_version() { return OS_VERSION; }
-const char* sysinfo_get_dev_status() { return OS_DEV_STATUS; }
-
-void sysinfo_print_info()
+void CMD_METHOD_MEMINFO(char* input, char** argv, int argc)
 {
-    term_set_cursor(0, 0);
-    term_writeln_fg("Napalm OS", COL32_MAGENTA);
-    term_writeln_fg("Version 0.2", COL32_DARKGRAY);
-
-    term_write_fg("Bootloader       :       ", COL32_YELLOW);
-    term_writeln(mboot_get().bootloader_name);
-
     term_write_fg("Kernel Memory    :       ", COL32_YELLOW);
     term_printf("0x%8x - 0x%8x\n", kernel_address_start(), kernel_address_end());
 
@@ -45,8 +30,4 @@ void sysinfo_print_info()
     term_printf("%d MB ", mm_amount_free() / 1024 / 1024); 
     term_set_cursor_x(34);
     term_set_fg(COL32_GRAY); term_printf("(%d bytes)         \n", mm_amount_free()); term_set_fg(COL32_WHITE);
-
-    term_write_fg("CPU Usage        :       ", COL32_YELLOW);
-    term_printf("%f", taskmgr_get_cpu_usage());
-    term_writeln("%");
 }

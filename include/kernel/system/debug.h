@@ -23,6 +23,8 @@ typedef enum
     EXCEPTION_OUTOFMEMORY,
     EXCEPTION_TIMEOUT,
     EXCEPTION_FILENOTFOUND,
+    EXCEPTION_DISKREAD,
+    EXCEPTION_DISKWRITE,
     EXCEPTION_CORRUPTEDMEMORY,
     EXCEPTION_COUNT,
 } EXCEPTION;
@@ -77,6 +79,8 @@ static const char* EXCEPTION_MSGS[EXCEPTION_COUNT] =
     "OutOfMemoryException",
     "TimeoutException",
     "FileNotFoundException",
+    "DiskReadException",
+    "DiskWriteException",
     "MemoryCorruptionException",
 };
 

@@ -9,9 +9,6 @@ thread_t* thread_kernel;
 thread_t* thread_idle;
 uint32_t  kernel_time, kernel_timelast;
 
-spinlock_t kernel_lock;
-spinlock_t idle_lock;
-
 int idle_main(void* arg);
 
 // entry point from bootstrap assembly
@@ -56,7 +53,13 @@ void kernel_boot()
     // initialize vesa driver
     vesa_identify();
 
+    // initialize terminal
     term_init();
+
+    // initialize ata
+    atapio_init();
+    fs_mount();
+    fs_filetable_print();
 
     // initialize rtc and pit interrupts
     rtc_init();
@@ -95,7 +98,7 @@ void kernel_before_run()
 
 void kernel_run()
 {
-    spinlock_lock(&kernel_lock);
+    spinlock_lock(&thread_kernel->lock);
     
     cli_monitor();
     thread_monitor(thread_kernel);
@@ -106,7 +109,7 @@ void kernel_run()
         kernel_timelast = kernel_time;
         taskmgr_calculate_cpu_usage();
     }
-    spinlock_unlock(&kernel_lock);
+    spinlock_unlock(&thread_kernel->lock);
 }
 
 // idle thread method
@@ -114,9 +117,9 @@ int idle_main(void* arg)
 {
     while (TRUE)
     {
-        spinlock_lock(&idle_lock);
+        spinlock_lock(&thread_idle->lock);
         thread_monitor(thread_idle);
-        spinlock_unlock(&idle_lock);
+        spinlock_unlock(&thread_idle->lock);
     }
     return 0;
 }

@@ -76,7 +76,11 @@ void* tcalloc(uint32_t size, uint8_t state) { return mm_allocate(size, TRUE, sta
 
 void* realloc(void* ptr, uint32_t size) { return NULL; }
 
-void free(void* ptr) { mm_free(ptr); }
+void free(void* ptr) 
+{ 
+    if (ptr == NULL) { return; }
+    mm_free(ptr); 
+}
 
 void freearray(void** ptr, uint32_t count)
 {

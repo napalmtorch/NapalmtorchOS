@@ -81,12 +81,13 @@ void mm_print_heap(DEBUGMODE mode)
     debug_write_col("------ ", COL4_DARKGRAY);
     debug_write_col("HEAP TABLE", COL4_YELLOW);
     debug_writeln_col(" ----------------------------------------", COL4_DARKGRAY);
-    debug_writeln_col("INDEX       STATE  PTR         SIZE        BYTES", COL4_DARKGRAY);
+    debug_writeln_col("INDEX       STATE  PTR         THREAD     SIZE        BYTES", COL4_DARKGRAY);
 
     for (uint32_t i = 0; i < mm_info.count_max; i++)
     {
         if (!mm_validate_ptr(mm_table[i].ptr)) { continue; }
-        debug_printf("0x%8x  0x%2x   0x%8x  0x%8x  %d\n", mm_index_from_ptr(mm_table[i].ptr), mm_table[i].state, (uint32_t)mm_table[i].ptr, mm_table[i].size, mm_table[i].size_bytes);
+        debug_printf("0x%8x  0x%2x   0x%8x  0x%8x  0x%8x  %d\n", 
+            mm_index_from_ptr(mm_table[i].ptr), mm_table[i].state, (uint32_t)mm_table[i].ptr, (uint32_t)mm_table[i].thread, mm_table[i].size, mm_table[i].size_bytes);
     }
 
     debug_setmode(old);
@@ -136,12 +137,14 @@ void mm_print_free(heap_entry_t* entry)
 
 void* mm_allocate(size_t size, bool_t clear, uint8_t state)
 {
-    if (size == 0) { panicf(EXCEPTION_ARG_OUTOFRANGE, NULL, "mm_allocate"); return NULL; }
+    if (size == 0) { return NULL; }
+    //if (size == 0) { panicf(EXCEPTION_ARG_OUTOFRANGE, NULL, "mm_allocate"); return NULL; }
     heap_entry_t* entry = mm_allocate_entry(size);
     if (!mm_validate_entry(entry, TRUE)) { return NULL; }
+    entry->thread = taskmgr_get_current_thread();
 
     if (state != MEMSTATE_FREE) { entry->state = state; }
-    if (clear) { memset(entry->ptr, 0, entry->size); }
+    if (clear) { memsetl(entry->ptr, 0, entry->size); }
     mm_info.data_used += entry->size;
     mm_print_alloc(entry);
     return entry->ptr;
@@ -149,7 +152,7 @@ void* mm_allocate(size_t size, bool_t clear, uint8_t state)
 
 void mm_free(void* ptr)
 {
-    if (!mm_validate_ptr(ptr)) { panicf(EXCEPTION_ARG, NULL, "mm_free"); return; }
+    //if (!mm_validate_ptr(ptr)) { panicf(EXCEPTION_ARG, NULL, "mm_free, address = 0x%8x", (uint32_t)ptr); return; }
 
     for (uint32_t i = 0; i < mm_info.count_max; i++)
     {
@@ -165,7 +168,7 @@ void mm_free(void* ptr)
         }
     }
 
-    panicf(EXCEPTION_CORRUPTEDMEMORY, NULL, "Unable to free pointer 0x%8x", (uint32_t)ptr);
+    //panicf(EXCEPTION_CORRUPTEDMEMORY, NULL, "Unable to free pointer 0x%8x", (uint32_t)ptr);
 }
 
 heap_entry_t* mm_allocate_entry(uint32_t size)
@@ -177,9 +180,10 @@ heap_entry_t* mm_allocate_entry(uint32_t size)
     for (uint32_t i = 0; i < mm_info.count_max; i++)
     {
         if (!mm_validate_entry(&mm_table[i], FALSE)) { continue; }
-        if (mm_table[i].size == aligned && mm_table[i].size_bytes == size && mm_table[i].state == MEMSTATE_FREE)
+        if (mm_table[i].size == aligned && mm_table[i].state == MEMSTATE_FREE)
         {
             mm_table[i].state = MEMSTATE_USED;
+            mm_table[i].size_bytes = size;
             return &mm_table[i];
         }
     }

@@ -52,21 +52,7 @@ void taskmgr_ready_thread(thread_t* thread)
 // mark thread as not ready and remove from linked list
 void taskmgr_unready_thread(thread_t* thread)
 {
-    for (uint32_t i = 0; i < TASKMGR_MAX; i++)
-    {
-        if (taskmgr_list[i] == NULL) { continue; }
-        if (taskmgr_list[i] == thread)
-        {
-            
-            debug_info("Unloaded thread");
-            taskmgr_count--;
-            taskmgr_current = NULL;
-            taskmgr_next = NULL;
-            taskmgr_index = 0;
-            
-            return;
-        }
-    }
+
 }
 
 bool_t taskmgr_terminate(thread_t* thread)
@@ -132,6 +118,12 @@ void taskmgr_schedule()
     if (taskmgr_next->state == THREADSTATE_HALTED) { taskmgr_schedule(); return; }
     else if (taskmgr_next->state == THREADSTATE_TERMINATED)
     {
+        if (taskmgr_next->runtime != NULL)
+        {
+            runtime_dispose(taskmgr_next->runtime);
+        }
+
+        term_printf("Thread %d exited with code %d\n", taskmgr_next->id, taskmgr_next->exit_code);
         free(taskmgr_next->stack);
         free(taskmgr_next);
         taskmgr_list[taskmgr_index] = NULL;

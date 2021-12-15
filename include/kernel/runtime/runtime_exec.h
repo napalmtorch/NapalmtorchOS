@@ -1,6 +1,5 @@
 #pragma once
 #include <lib/types.h>
-#include <kernel/system/thread.h>
 
 typedef enum
 {
@@ -41,11 +40,13 @@ typedef struct
     uint32_t     registers[VMREG_COUNT];
     VMSTATE      state;
     executable_t program;
-    thread_t*    thread;
+    void*        thread;
+    uint32_t     exit_code;
 } runtime_t;
 
 runtime_t* runtime_create(const char* name, executable_t prog);
 runtime_t* runtime_create_raw(uint8_t* data, uint32_t size);
-bool_t    runtime_start(runtime_t* runtime);
-bool_t    runtime_stop(runtime_t* runtime);
-int       runtime_main(runtime_t* runtime);
+void       runtime_dispose(runtime_t* runtime);
+bool_t     runtime_start(runtime_t* runtime);
+bool_t     runtime_stop(runtime_t* runtime);
+int        runtime_main(runtime_t* runtime);
