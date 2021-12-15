@@ -57,7 +57,7 @@ void kernel_boot()
 
     // initialize rtc and pit interrupts
     rtc_init();
-    pit_init(5000);
+    pit_init(2000);
 }
 
 void kernel_before_run()
@@ -132,7 +132,7 @@ int idle_main(thread_t* thread)
     while (TRUE)
     {
         tlock();
-        thread_monitor(thread);
+        thread_monitor(thread_idle);
         tunlock();
     }
     return 0;

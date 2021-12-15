@@ -125,39 +125,26 @@ void taskmgr_schedule()
 {
     // validate
     if (!taskmgr_ready) { return; }
-
+    
     taskmgr_current = taskmgr_list[taskmgr_index];
     if (taskmgr_current == NULL) { taskmgr_index = 0; return; }
     if (taskmgr_current->locked) { return; }
 
     taskmgr_index++;
-    while (!taskmgr_list[taskmgr_index]) { taskmgr_index++; }
+    while (taskmgr_list[taskmgr_index] == NULL) { taskmgr_index++; }
     if (taskmgr_index >= TASKMGR_MAX) { taskmgr_index = 0; }
     taskmgr_next = taskmgr_list[taskmgr_index];
-    if (taskmgr_next == NULL) { return; }
-    if (taskmgr_current->terminated) { return; }
-
-    if (taskmgr_next == NULL) 
-    { 
-        taskmgr_index++;
-        while (!taskmgr_list[taskmgr_index]) { taskmgr_index++; }
-        if (taskmgr_index >= TASKMGR_MAX) { taskmgr_index = 0; }
-        taskmgr_next = taskmgr_list[taskmgr_index];
-        if (taskmgr_next == NULL) { return; }
-    }
 
     if (taskmgr_next->terminated)
     {
-        uint32_t freed_id = taskmgr_next->id;
         free(taskmgr_next->stack);
         free(taskmgr_next);
         taskmgr_list[taskmgr_index] = NULL;
-        taskmgr_count--;
-        taskmgr_index++;
-        if (taskmgr_index >= TASKMGR_MAX) { taskmgr_index = 0; }
-        taskmgr_next = taskmgr_list[taskmgr_index];
-        if (taskmgr_next == NULL) { return; }
+        taskmgr_next = taskmgr_list[0];
+        taskmgr_index = 0;
     }
+
+    //debug_info("SWITCHING FROM %d TO %d", taskmgr_current->id, taskmgr_next->id);
 
     switch_thread();
 }
