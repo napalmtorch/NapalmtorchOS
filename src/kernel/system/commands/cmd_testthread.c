@@ -9,7 +9,7 @@ int thread_test(void* arg)
     term_printf("Hello world\n");
     term_printf("This is a test thread\n"); 
     spinlock_unlock(&test_lock);
-    return 0xFF;
+    return 32;
 }
 
 void CMD_METHOD_TESTTHREAD(char* input, char** argv, int argc)

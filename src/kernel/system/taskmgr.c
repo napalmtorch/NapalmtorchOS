@@ -124,6 +124,7 @@ void taskmgr_schedule()
         }
 
         term_printf("Thread %d exited with code %d\n", taskmgr_next->id, taskmgr_next->exit_code);
+        serial_printf("Thread %d exited with code %d\n", taskmgr_next->id, taskmgr_next->exit_code);
         free(taskmgr_next->stack);
         free(taskmgr_next);
         taskmgr_list[taskmgr_index] = NULL;
@@ -179,4 +180,9 @@ void spinlock_lock (spinlock_t *lock)
 void spinlock_unlock (spinlock_t *lock)
 {
     *lock = 0;
+}
+
+void pause()
+{
+    taskmgr_current->state = THREADSTATE_HALTED;
 }

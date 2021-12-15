@@ -152,11 +152,10 @@ void* mm_allocate(size_t size, bool_t clear, uint8_t state)
 
 void mm_free(void* ptr)
 {
-    //if (!mm_validate_ptr(ptr)) { panicf(EXCEPTION_ARG, NULL, "mm_free, address = 0x%8x", (uint32_t)ptr); return; }
-
     for (uint32_t i = 0; i < mm_info.count_max; i++)
     {
         if (!mm_validate_entry(&mm_table[i], FALSE)) { continue; }
+        if (mm_table[i].size == 0 || mm_table[i].state == MEMSTATE_FREE) { continue; }
 
         if (mm_table[i].ptr == ptr)
         {
@@ -167,8 +166,6 @@ void mm_free(void* ptr)
             return;
         }
     }
-
-    //panicf(EXCEPTION_CORRUPTEDMEMORY, NULL, "Unable to free pointer 0x%8x", (uint32_t)ptr);
 }
 
 heap_entry_t* mm_allocate_entry(uint32_t size)

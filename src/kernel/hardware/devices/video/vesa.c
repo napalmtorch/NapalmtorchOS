@@ -56,7 +56,7 @@ void vesa_identify()
 
 bool_t vesa_setmode(int w, int h)
 {
-    if (vesa_service->started) { return FALSE; }
+    if (!vesa_service->started) { return FALSE; }
                 
     // populate info block
     vesa_probe();
@@ -84,17 +84,19 @@ bool_t vesa_setmode(int w, int h)
             mode = modes[i];
             
             size_t size = (info->height * info->pitch);
+    
 
             vesa_width  = info->width;
             vesa_height = info->height;
             vesa_buffer = info->physical_base;
+            vesa_buffer_size = size;
 
             regs.AX = 0x4F02;
             regs.BX = mode | 0x4000;
             _int_16(0x10, &regs);
-            vesa_probe();
 
             memcpy(&vesa_mode_info, info, sizeof(vesa_mode_info_t));
+            debug_info("Set VESA mode to %dx%dx%d", vesa_width, vesa_height, 32);
             return TRUE;
         }
     }

@@ -17,3 +17,5 @@ double   taskmgr_get_cpu_usage();
 
 void spinlock_lock (spinlock_t *lock);
 void spinlock_unlock (spinlock_t *lock);
+
+void pause();

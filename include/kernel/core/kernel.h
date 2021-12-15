@@ -31,6 +31,7 @@
 #include <kernel/filesys/vfs.h>
 #include <kernel/runtime/runtime_exec.h>
 #include <kernel/runtime/runtime_mem.h>
+#include <kernel/runtime/runtime_isa.h>
 
 extern uint32_t kernel_size;
 

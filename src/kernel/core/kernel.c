@@ -52,6 +52,7 @@ void kernel_boot()
 
     // initialize vesa driver
     vesa_identify();
+    vesa_setmode(1280, 720);
 
     // initialize terminal
     term_init();
@@ -59,7 +60,6 @@ void kernel_boot()
     // initialize ata
     atapio_init();
     fs_mount();
-    fs_filetable_print();
 
     // initialize rtc and pit interrupts
     rtc_init();

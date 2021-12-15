@@ -52,10 +52,11 @@ thread_t* thread_create(const char* name, thread_entry_t entry, uint32_t stack_s
 // on thread exit
 void thread_exit(thread_t* thread)
 {
+    register uint32_t code asm ("eax");
+    uint32_t realcode = code;
     cli();
     spinlock_lock(&thread->lock);
-    register int code asm ("eax");
-    thread->exit_code = code;
+    thread->exit_code = realcode;
     thread->state = THREADSTATE_TERMINATED;
     spinlock_unlock(&thread->lock);
     sti();
