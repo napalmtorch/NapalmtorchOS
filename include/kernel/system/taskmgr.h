@@ -12,6 +12,7 @@ void   taskmgr_schedule();
 
 thread_t** taskmgr_get_threads(uint32_t* count);
 thread_t*  taskmgr_get_thread_byid(uint32_t id);
+thread_t*  taskmgr_get_current_thread();
 double   taskmgr_get_cpu_usage();
 
 void tlock();

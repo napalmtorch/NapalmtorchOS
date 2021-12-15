@@ -9,7 +9,6 @@ switch_thread:
     ; load current thread into eax
     mov eax, [taskmgr_current]
     ;mov eax, [eax]
-    xchg bx, bx
 
     ; save general purpose registers to current thread
     mov [eax+0],  esp
@@ -20,6 +19,7 @@ switch_thread:
     mov [eax+20], edx
     mov [eax+24], esi
     mov [eax+28], edi
+    xchg bx, bx
     
     ; save eflags to current thread
     pushf
@@ -49,6 +49,7 @@ switch_thread:
     sti
 
     ; return to next thread which will be popped from next thread stack
+    xchg bx, bx
     ret
 
     

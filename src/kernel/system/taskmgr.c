@@ -27,27 +27,43 @@ void taskmgr_init(thread_t* init_thread)
 // allow task switching to happen
 void taskmgr_start() { taskmgr_ready = TRUE; }
 
+int taskmgr_free_index()
+{
+    for (uint32_t i = 0; i < TASKMGR_MAX; i++)
+    {
+        if (taskmgr_list[i] == NULL) { return i; }
+    }
+    return -1;
+}
+
 // mark thread as ready and add to linked list
 void taskmgr_ready_thread(thread_t* thread)
 {
-    if (taskmgr_count >= TASKMGR_MAX) { return; }
-    taskmgr_list[taskmgr_count] = thread;
+    tlock();
+    int index = taskmgr_free_index();
+    if (index < 0 || index >= TASKMGR_MAX) { panicf(EXCEPTION_INDEX_OUTOFRANGE, NULL, "taskmgr_ready_thread"); return; }
+    debug_info("INDEX: %d", index);
+    taskmgr_list[index] = thread;
     taskmgr_count++;
     debug_info("Loaded thread %d", thread->id);
+    tunlock();
 }
 
 // mark thread as not ready and remove from linked list
 void taskmgr_unready_thread(thread_t* thread)
 {
-    for (uint32_t i = 0; i < taskmgr_count; i++)
+    for (uint32_t i = 0; i < TASKMGR_MAX; i++)
     {
         if (taskmgr_list[i] == NULL) { continue; }
         if (taskmgr_list[i] == thread)
         {
-            free(taskmgr_list[i]->stack);
-            free(taskmgr_list[i]);
-            taskmgr_list[i] = NULL;
+            tlock();
             debug_info("Unloaded thread");
+            taskmgr_count--;
+            taskmgr_current = NULL;
+            taskmgr_next = NULL;
+            taskmgr_index = 0;
+            tunlock();
             return;
         }
     }
@@ -55,15 +71,18 @@ void taskmgr_unready_thread(thread_t* thread)
 
 bool_t taskmgr_terminate(thread_t* thread)
 {
-    for (uint32_t i = 0; i < taskmgr_count; i++)
+    cli();
+    for (uint32_t i = 0; i < TASKMGR_MAX; i++)
     {
         if (taskmgr_list[i] == NULL) { continue; }
         if (taskmgr_list[i] == thread)
         {
             taskmgr_list[i]->terminated = TRUE;
+            sti();
             return TRUE;
         }
     }
+    sti();
     return FALSE;
 }
 
@@ -81,7 +100,7 @@ void taskmgr_calculate_cpu_usage()
     total_tps = 0;
     total_tps_old = 0;
 
-    for (uint32_t i = 0; i < taskmgr_count; i++)
+    for (uint32_t i = 0; i < TASKMGR_MAX; i++)
     {
         if (taskmgr_list[i] == NULL) { continue; }
         if (taskmgr_list[i] == idle_get_thread()) { continue; }
@@ -108,27 +127,37 @@ void taskmgr_schedule()
     if (!taskmgr_ready) { return; }
 
     taskmgr_current = taskmgr_list[taskmgr_index];
+    if (taskmgr_current == NULL) { taskmgr_index = 0; return; }
     if (taskmgr_current->locked) { return; }
 
     taskmgr_index++;
-    if (taskmgr_index >= taskmgr_count) { taskmgr_index = 0; }
+    while (!taskmgr_list[taskmgr_index]) { taskmgr_index++; }
+    if (taskmgr_index >= TASKMGR_MAX) { taskmgr_index = 0; }
     taskmgr_next = taskmgr_list[taskmgr_index];
+    if (taskmgr_next == NULL) { return; }
+    if (taskmgr_current->terminated) { return; }
 
     if (taskmgr_next == NULL) 
     { 
         taskmgr_index++;
-        if (taskmgr_index >= taskmgr_count) { taskmgr_index = 0; }
-        return;
-    }
-    if (taskmgr_next->terminated)
-    {
-        taskmgr_index++;
-        if (taskmgr_index >= taskmgr_count) { taskmgr_index = 0; }
-        taskmgr_unready_thread(taskmgr_next);
-        return;
+        while (!taskmgr_list[taskmgr_index]) { taskmgr_index++; }
+        if (taskmgr_index >= TASKMGR_MAX) { taskmgr_index = 0; }
+        taskmgr_next = taskmgr_list[taskmgr_index];
+        if (taskmgr_next == NULL) { return; }
     }
 
-    //debug_info("NEXT: %d", taskmgr_next->id);
+    if (taskmgr_next->terminated)
+    {
+        uint32_t freed_id = taskmgr_next->id;
+        free(taskmgr_next->stack);
+        free(taskmgr_next);
+        taskmgr_list[taskmgr_index] = NULL;
+        taskmgr_count--;
+        taskmgr_index++;
+        if (taskmgr_index >= TASKMGR_MAX) { taskmgr_index = 0; }
+        taskmgr_next = taskmgr_list[taskmgr_index];
+        if (taskmgr_next == NULL) { return; }
+    }
 
     switch_thread();
 }
@@ -143,7 +172,7 @@ thread_t** taskmgr_get_threads(uint32_t* count)
 
 thread_t* taskmgr_get_thread_byid(uint32_t id)
 {
-    for (uint32_t i = 0; i < taskmgr_count; i++)
+    for (uint32_t i = 0; i < TASKMGR_MAX; i++)
     {
         if (taskmgr_list[i] == NULL) { continue; }
         if (taskmgr_list[i]->id == id)
@@ -153,6 +182,8 @@ thread_t* taskmgr_get_thread_byid(uint32_t id)
     }
     return NULL;
 }
+
+thread_t*  taskmgr_get_current_thread() { return taskmgr_current; }
 
 double taskmgr_get_cpu_usage() { return taskmgr_cpu_usage; }
 

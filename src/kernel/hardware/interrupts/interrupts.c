@@ -32,6 +32,8 @@ void irq_unregister(uint8_t num)
 // on isr interrupt from common stub
 void isr_handler(registers_t* regs)
 {
+    debug_info("THREAD: 0x%8x, ID = %d", (uint32_t)taskmgr_get_current_thread(), taskmgr_get_current_thread()->id);
+    debug_dumpregs(&taskmgr_get_current_thread()->registers, DEBUGMODE_SERIAL);
     panici(regs->int_no, regs);
 }
 

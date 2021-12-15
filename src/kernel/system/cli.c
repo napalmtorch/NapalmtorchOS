@@ -57,6 +57,7 @@ void cli_register_defaults()
     cli_register(CMD_CLS);
     cli_register(CMD_HELP);
     cli_register(CMD_THREADS);
+    cli_register(CMD_TESTTHREAD);
     cli_register(CMD_KILL);
     cli_register(CMD_CPUINFO);
 }
