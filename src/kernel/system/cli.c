@@ -87,10 +87,10 @@ bool_t cli_unregister_byname(const char* cmd)
 
 void cli_print_caret()
 {
-   vga_write_fg("root", COL4_GREEN);
-   vga_write("@");
-   vga_write_fg("/", COL4_YELLOW);
-   vga_write("> ");
+   term_write_fg("root", COL32_GREEN);
+   term_write("@");
+   term_write_fg("/", COL32_YELLOW);
+   term_write("> ");
 }
 
 void cli_print_help(bool_t usage)
@@ -98,10 +98,10 @@ void cli_print_help(bool_t usage)
     for (uint32_t i = 0; i < cli_count_max; i++)
     {
         if (cli_list[i].m_execute == NULL) { continue; }
-       vga_write("- ");
-       vga_write_fg(cli_list[i].name, COL4_YELLOW);
-       vga_set_cursor_x(24);
-        if (usage) {vga_writeln(cli_list[i].usage); } else {vga_writeln(cli_list[i].help); }
+       term_write("- ");
+       term_write_fg(cli_list[i].name, COL32_YELLOW);
+       term_set_cursor_x(24);
+        if (usage) { term_writeln(cli_list[i].usage); } else {term_writeln(cli_list[i].help); }
     }
 }
 
@@ -110,11 +110,11 @@ void cli_print_help_short()
     for (uint32_t i = 0; i < cli_count_max; i++)
     {
         if (cli_list[i].m_execute == NULL) { continue; }
-        if (vga_get_cursor_x() + strlen(cli_list[i].name) >=vga_get_width()) {vga_newline(); }
-       vga_write(cli_list[i].name);
-       vga_writechar(0x20);
+        if (term_get_cursor_x() + strlen(cli_list[i].name) >=term_get_width()) {term_newline(); }
+       term_write(cli_list[i].name);
+       term_writechar(0x20);
     }
-   vga_newline();
+   term_newline();
 }
 
 void cli_monitor()
@@ -122,7 +122,7 @@ void cli_monitor()
     if (kbps2_key_down(KEY_ENTER) && !cli_executing)
     {
         cli_executing = TRUE;
-        vga_newline();
+        term_newline();
         cli_execute((char*)cli_instream.data);
         bytestream_clear(&cli_instream);
         cli_print_caret();
@@ -159,7 +159,7 @@ void cli_execute(const char* input)
         }
     }
 
-   vga_writeln_fg("Invalid command or file", COL4_RED);
+   term_writeln_fg("Invalid command or file", COL32_RED);
     free(cmd);
 }
 

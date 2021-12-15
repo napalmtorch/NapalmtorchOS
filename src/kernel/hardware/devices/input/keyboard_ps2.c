@@ -4,7 +4,7 @@
 service_t*      kbps2_service;
 bytestream_t    kbps2_stream;
 uint8_t         kbps2_scancode;
-bool_t          kbps2_vga_output;
+bool_t          kbps2_term_output;
 void            (*kbps2_enter_event)(bytestream_t* stream);
 uint8_t*        kbps2_keymap;
 spinlock_t      kbps2_lock;
@@ -43,7 +43,7 @@ void kbps2_init()
 
 void kbps2_callback(registers_t* regs)
 {
-    tlock();
+    
 
     // get status
     uint8_t status = port_inb(0x64);
@@ -57,7 +57,7 @@ void kbps2_callback(registers_t* regs)
     kbps2_scancode = port_inb(0x60);
     kbps2_handle_scancode(kbps2_scancode);
 
-    tunlock();
+    
 }
 
 void kbps2_handle_scancode(uint8_t code)
@@ -109,7 +109,7 @@ void kbps2_handle_char(char c)
         if (strlen(kbps2_stream.data) > 0)
         {
             kbps2_stream.data[strlen(kbps2_stream.data) - 1] = 0;
-            if (kbps2_vga_output) { vga_delete(); }
+            if (kbps2_term_output) { term_delete(); }
         }
         kbps2_backspace = FALSE;
     }
@@ -118,7 +118,7 @@ void kbps2_handle_char(char c)
         uint32_t len = strlen(kbps2_stream.data);
         kbps2_stream.data[len] = c;
         kbps2_stream.data[len + 1] = 0;
-        if (kbps2_vga_output) { vga_writechar(c); }
+        if (kbps2_term_output) { term_writechar(c); }
     }
 }
 
@@ -145,7 +145,7 @@ void kbps2_keymap_update()
 
 void kbps2_set_enter_event(void (*event)(bytestream_t*)) { kbps2_enter_event = event; }
 
-void kbps2_toggle_vga_output(bool_t state) { kbps2_vga_output = state; }
+void kbps2_toggle_term_output(bool_t state) { kbps2_term_output = state; }
 
 void kbps2_set_stream(bytestream_t stream) 
 { 

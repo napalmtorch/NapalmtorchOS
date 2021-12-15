@@ -4380,7 +4380,7 @@ Disassembly of section .text:
   102f71:	e8 a6 02 00 00       	call   10321c <kbps2_init>
   102f76:	83 ec 0c             	sub    esp,0xc
   102f79:	6a 01                	push   0x1
-  102f7b:	e8 fb 06 00 00       	call   10367b <kbps2_toggle_vga_output>
+  102f7b:	e8 fb 06 00 00       	call   10367b <kbps2_toggle_term_output>
   102f80:	83 c4 10             	add    esp,0x10
   102f83:	e8 a6 d1 ff ff       	call   10012e <cli_init>
   102f88:	e8 d7 d3 ff ff       	call   100364 <cli_print_caret>
@@ -4949,7 +4949,7 @@ Disassembly of section .text:
   103679:	5d                   	pop    ebp
   10367a:	c3                   	ret    
 
-0010367b <kbps2_toggle_vga_output>:
+0010367b <kbps2_toggle_term_output>:
   10367b:	55                   	push   ebp
   10367c:	89 e5                	mov    ebp,esp
   10367e:	83 ec 04             	sub    esp,0x4

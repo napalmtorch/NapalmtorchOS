@@ -6,7 +6,7 @@ typedef enum
 {
     THREADSTATE_HALTED,
     THREADSTATE_RUNNING,
-    THREADSTATE_COMPLETED,
+    THREADSTATE_TERMINATED,
 } THREADSTATE;
 
 typedef int (*thread_entry_t)(void*);
@@ -19,7 +19,6 @@ typedef struct
 typedef struct
 {
     uint32_t ticks, ticks_per_second, tps_old;
-    
     uint64_t ticks_total;
     uint32_t seconds_total;
     uint32_t time, last_time;
@@ -32,12 +31,13 @@ typedef struct
     uint32_t      id;
     uint32_t*     stack;
     uint32_t      stack_size;
-    bool_t        locked, terminated;
+    THREADSTATE   state;
     thread_time_t time;
-} thread_t;
+    char          name[64];
+} PACKED thread_t;
 
 extern void switch_thread();
 
 thread_t* thread_initial();
-thread_t* thread_create(thread_entry_t entry, uint32_t stack_size);
+thread_t* thread_create(const char* name, thread_entry_t entry, uint32_t stack_size);
 void      thread_monitor(thread_t* thread);

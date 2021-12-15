@@ -7,7 +7,7 @@ extern uint32_t stack_bottom;
 // threading information
 uint32_t   thread_cid = 0;
 
-void thread_exit();
+void thread_exit(thread_t* thread);
 
 // generate kernel thread using current registers
 thread_t* thread_initial()
@@ -17,21 +17,26 @@ thread_t* thread_initial()
     thread->stack = &stack_top;
     thread->stack_size = &stack_top - &stack_bottom;
     thread->registers.eflags = 0x200;
+    thread->state = THREADSTATE_RUNNING;
     return thread;
 }
 
 // create new thread with specified entry pointer, stack size, and arguments pointer
-thread_t* thread_create(thread_entry_t entry, uint32_t stack_size)
+thread_t* thread_create(const char* name, thread_entry_t entry, uint32_t stack_size)
 {
-    thread_t* thread = calloc(sizeof(thread_t));
-    memset(thread, 0, sizeof(thread_t));
-    thread->id = thread_cid++;
+    thread_t* thread = tcalloc(sizeof(thread_t), MEMSTATE_THREAD);
 
+    // copy name
+    for (uint32_t i = 0; i < strlen(name); i++) { if (i < 64) { thread->name[i] = name[i]; } }
+    
+    thread->id = thread_cid++;
     thread->stack = calloc(stack_size);
     thread->stack_size = stack_size;
+    thread->state = THREADSTATE_HALTED;
 
     uint32_t* s = ((uint32_t)thread->stack + (stack_size - 16));
 
+    *--s = (uint32_t)thread;
     *--s = (uint32_t)thread;
     *--s = (uint32_t)&thread_exit;
     *--s = (uint32_t)entry;
@@ -39,15 +44,16 @@ thread_t* thread_create(thread_entry_t entry, uint32_t stack_size)
     thread->registers.esp    = (uint32_t)s;
     thread->registers.ebp    = 0;
     thread->registers.eflags = 0x200;
-    taskmgr_ready_thread(thread);
     debug_info("Created thread: ID = %d, ESP: 0x%8x, ENTRY: 0x%8x", thread->id, thread->registers.esp, (uint32_t)entry);
     return thread;
 }
 
 // on thread exit
-void thread_exit()
+void thread_exit(thread_t* thread)
 {
-    debug_info("Thread exited");
+    register uint32_t code asm ("eax");
+    debug_info("Thread %d exited with code %d", thread->id, code);
+    thread->state = THREADSTATE_TERMINATED;
     while (TRUE);
 }
 

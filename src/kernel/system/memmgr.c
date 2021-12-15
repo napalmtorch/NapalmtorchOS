@@ -26,7 +26,7 @@ int           mm_free_index();
 void mm_init()
 {
     // enable messages by default
-    mm_messages = TRUE;
+    mm_messages = FALSE;
 
     // read memory map
     mm_mmap_read();
@@ -78,10 +78,10 @@ void mm_print_heap(DEBUGMODE mode)
     DEBUGMODE old = debug_getmode();
     debug_setmode(mode);
 
-    debug_write_col("------ ", COL4_DARKGRAY);
-    debug_write_col("HEAP TABLE", COL4_YELLOW);
-    debug_writeln_col(" ----------------------------------------", COL4_DARKGRAY);
-    debug_writeln_col("INDEX       STATE  PTR         SIZE        BYTES", COL4_DARKGRAY);
+    debug_write_col("------ ", COL32_DARKGRAY);
+    debug_write_col("HEAP TABLE", COL32_YELLOW);
+    debug_writeln_col(" ----------------------------------------", COL32_DARKGRAY);
+    debug_writeln_col("INDEX       STATE  PTR         SIZE        BYTES", COL32_DARKGRAY);
 
     for (uint32_t i = 0; i < mm_info.count_max; i++)
     {
@@ -99,25 +99,25 @@ void mm_print_mmap(DEBUGMODE mode)
 
 void mm_print_info()
 {
-    vga_write_fg("------ ", COL4_DARKGRAY);
-    vga_write_fg("MEMORY USAGE", COL4_YELLOW);
-    vga_writeln_fg(" --------------------------------------", COL4_DARKGRAY);
+    term_write_fg("------ ", COL32_DARKGRAY);
+    term_write_fg("MEMORY USAGE", COL32_YELLOW);
+    term_writeln_fg(" --------------------------------------", COL32_DARKGRAY);
 
-    vga_write("- ");
-    vga_write_fg("INSTALLED               ", COL4_YELLOW);
-    vga_printf("%d MB(%d bytes)\n", mm_amount_installed() / 1024 / 1024, mm_amount_installed());
+    term_write("- ");
+    term_write_fg("INSTALLED               ", COL32_YELLOW);
+    term_printf("%d MB(%d bytes)\n", mm_amount_installed() / 1024 / 1024, mm_amount_installed());
 
-    vga_write("- ");
-    vga_write_fg("RESERVED                ", COL4_YELLOW);
-    vga_printf("%d MB(%d bytes)\n", mm_amount_reserved() / 1024 / 1024, mm_amount_reserved());
+    term_write("- ");
+    term_write_fg("RESERVED                ", COL32_YELLOW);
+    term_printf("%d MB(%d bytes)\n", mm_amount_reserved() / 1024 / 1024, mm_amount_reserved());
 
-    vga_write("- ");
-    vga_write_fg("USED                    ", COL4_YELLOW);
-    vga_printf("%d MB(%d bytes)\n", mm_amount_used() / 1024 / 1024, mm_amount_used());
+    term_write("- ");
+    term_write_fg("USED                    ", COL32_YELLOW);
+    term_printf("%d MB(%d bytes)\n", mm_amount_used() / 1024 / 1024, mm_amount_used());
 
-    vga_write("- ");
-    vga_write_fg("FREE                    ", COL4_YELLOW);
-    vga_printf("%d MB(%d bytes)\n", mm_amount_free() / 1024 / 1024, mm_amount_free());
+    term_write("- ");
+    term_write_fg("FREE                    ", COL32_YELLOW);
+    term_printf("%d MB(%d bytes)\n", mm_amount_free() / 1024 / 1024, mm_amount_free());
 }
 
 void mm_print_alloc(heap_entry_t* entry)

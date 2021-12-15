@@ -7,12 +7,12 @@ void CMD_METHOD_KILL(char* input, char** argv, int argc)
     {
         uint32_t id = atol(argv[1]);
         thread_t* thread = taskmgr_get_thread_byid(id);
-        if (thread == NULL) { vga_printf("No thread running with id %d\n", id); return; }
-        if (!taskmgr_terminate(thread)) { vga_printf("Unable to terminate thread %d\n", id); return; }
-        vga_write_fg("Terminated thread ", COL4_GREEN);
-        vga_printf("%d\n", id);
+        if (thread == NULL) { term_printf("No thread running with id %d\n", id); return; }
+        if (!taskmgr_terminate(thread)) { term_printf("Unable to terminate thread %d\n", id); return; }
+        term_write_fg("Terminated thread ", COL32_GREEN);
+        term_printf("%d\n", id);
         return;
     }
 
-   vga_writeln_fg("Invalid arguments", COL4_RED);
+   term_writeln_fg("Invalid arguments", COL32_RED);
 }

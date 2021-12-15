@@ -37,42 +37,42 @@ bool_t debug_isserial() { return (debug_mode == DEBUGMODE_SERIAL) || (debug_mode
 void debug_newline()
 {
     if (debug_isserial()) { serial_newline(); }
-    if (debug_isterm()) { vga_newline(); }
+    if (debug_isterm()) { term_newline(); }
 }
 
 // write character
 void debug_writechar(char c)
 {
     if (debug_isserial()) { serial_writechar(c); }
-    if (debug_isterm()) { vga_writechar(c); }
+    if (debug_isterm()) { term_writechar(c); }
 }
 
 // write string
 void debug_write(const char* str)
 {
     if (debug_isserial()) { serial_write(str); }
-    if (debug_isterm()) { vga_write(str); }
+    if (debug_isterm()) { term_write(str); }
 }
 
 // write string with specified fore color
 void debug_write_col(const char* str, uint8_t color)
 {
     if (debug_isserial()) { serial_write_col(str, color); }
-    if (debug_isterm()) { vga_write_fg(str, color); }
+    if (debug_isterm()) { term_write_fg(str, color); }
 }
 
 // write line
 void debug_writeln(const char* str)
 {
     if (debug_isserial()) { serial_writeln(str); }
-    if (debug_isterm()) { vga_writeln(str); }
+    if (debug_isterm()) { term_writeln(str); }
 }
 
 // write line with specified fore color
 void debug_writeln_col(const char* str, uint8_t color)
 {
     if (debug_isserial()) { serial_writeln_col(str, color); }
-    if (debug_isterm()) { vga_writeln_fg(str, color); }
+    if (debug_isterm()) { term_writeln_fg(str, color); }
 }
 
 // write formatted text with manually specified arguments

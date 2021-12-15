@@ -242,7 +242,7 @@ char** strsplit(char* str, char delim, int* count)
 
 string_t string_create(const char* str)
 {
-    tlock();
+    
     string_t output = { NULL, 0 };
     if (str != NULL)
     {
@@ -253,7 +253,7 @@ string_t string_create(const char* str)
             memcpy(output.data, str, output.length);
         }
     }
-    tunlock();
+    
     return output;
 }
 
@@ -276,7 +276,7 @@ bool_t string_clear(string_t* str)
 char* string_append_char(string_t* str, char c)
 {
     if (!string_validate(str)) { return NULL; }
-    tlock();
+    
     char* new_data = tcalloc(str->length + 2, MEMSTATE_STRING);
     memset(new_data, 0, str->length + 2);
 
@@ -292,24 +292,24 @@ char* string_append_char(string_t* str, char c)
     new_data[str->length + 1] = 0;
     str->data = new_data;
     str->length++;
-    tunlock();
+    
     return str->data;
 }
 
 char* string_append_int(string_t* str, uint32_t num, uint8_t base)
 {
-    tlock();
+    
     if (!string_validate(str)) { return NULL; }
     char append[64];
     ltoa(num, append, base);
     (void)string_append(str, append);
-    tunlock();
+    
     return str->data;
 }
 
 char* string_append(string_t* str, const char* append)
 {
-    tlock();
+    
     if (!string_validate(str)) { return NULL; }
     uint32_t new_len = str->length + strlen(append) + 1;
     char* new_data = tcalloc(new_len, MEMSTATE_STRING);
@@ -327,6 +327,6 @@ char* string_append(string_t* str, const char* append)
     str->data = new_data;
     str->length += strlen(append);
     new_data[str->length] = 0;
-    tunlock();
+    
     return str->data;
 }

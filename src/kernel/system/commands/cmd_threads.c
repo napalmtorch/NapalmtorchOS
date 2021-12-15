@@ -8,8 +8,8 @@ void CMD_METHOD_THREADS(char* input, char** argv, int argc)
 
     for (uint32_t i = 0; i < count; i++)
     {
-        if (threads[i]->terminated) { continue; }
-        vga_printf("THREAD: ID = %d, STACK_ADDR: 0x%8x, STACK_SIZE = %d bytes\n", threads[i]->id, (uint32_t)threads[i]->stack, threads[i]->stack_size);
+        if (threads[i] == NULL) { return; }
+        term_printf("THREAD: ID = %d, STACK_ADDR: 0x%8x, STACK_SIZE = 0x%8x, NAME: %s\n", threads[i]->id, (uint32_t)threads[i]->stack, threads[i]->stack_size, threads[i]->name);
     }
 
     free(threads);

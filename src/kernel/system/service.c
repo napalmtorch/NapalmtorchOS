@@ -15,15 +15,15 @@ bool_t service_initmgr()
 
 void service_printlist()
 {
-    vga_write_fg("------ ", COL4_DARKGRAY);
-    vga_write_fg("SERVICES", COL4_YELLOW);
-    vga_writeln_fg(" ------------------------------------------", COL4_DARKGRAY);
-    vga_writeln_fg("INDEX       TYPE   STATE   START       STOP        NAME ", COL4_DARKGRAY);
+    term_write_fg("------ ", COL32_DARKGRAY);
+    term_write_fg("SERVICES", COL32_YELLOW);
+    term_writeln_fg(" ------------------------------------------", COL32_DARKGRAY);
+    term_writeln_fg("INDEX       TYPE   STATE   START       STOP        NAME ", COL32_DARKGRAY);
 
     for (uint32_t i = 0; i < services_count_max; i++)
     {
         if (services_list[i] == NULL) { continue; }
-        vga_printf("0x%8x  0x%2x   0x%2x    0x%8x  0x%8x  %s\n", 
+        term_printf("0x%8x  0x%2x   0x%2x    0x%8x  0x%8x  %s\n", 
                     i, services_list[i]->type, services_list[i]->started, (uint32_t)services_list[i]->m_start, (uint32_t)services_list[i]->m_stop, services_list[i]->name);
     }
 }

@@ -14,7 +14,9 @@
 #include <kernel/hardware/common/serial.h>
 #include <kernel/hardware/common/pit.h>
 #include <kernel/hardware/common/rtc.h>
+#include <kernel/hardware/common/realmode.h>
 #include <kernel/hardware/devices/video/vga.h>
+#include <kernel/hardware/devices/video/vesa.h>
 #include <kernel/hardware/devices/input/keyboard_ps2.h>
 #include <kernel/system/debug.h>
 #include <kernel/system/memmgr.h>
@@ -22,6 +24,7 @@
 #include <kernel/system/thread.h>
 #include <kernel/system/sysinfo.h>
 #include <kernel/system/service.h>
+#include <kernel/system/terminal.h>
 #include <kernel/system/cli.h>
 
 extern uint32_t kernel_size;

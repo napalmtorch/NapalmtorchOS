@@ -33,8 +33,25 @@ nasm -felf32 "$cdir$inf" -o "$outdir$outf"
 echo "$nmsgl$cdir$inf$cmsgm$outdir$outf$cmsge"
 outdir="bin/objs/"
 
+# realmode.asm
+cdir="src/kernel/hardware/common/" outdir="bin/objs/" inf="realmode.asm" outf="realmode.o"
+nasm -felf32 "$cdir$inf" -o "$outdir$outf"
+echo "$nmsgl$cdir$inf$cmsgm$outdir$outf$cmsge"
+outdir="bin/objs/"
+
+
 # ----------------------------------------------- CORE --------------------------------------------------------------
 cdir="src/kernel/core/"
+for file in $cdir*.c
+do
+    inf="$(basename $file)"
+    outf="$(echo ${inf%.*}.o)"
+    i686-elf-gcc -w -Iinclude -c "$cdir$inf" -o "$outdir$outf" -nostdlib -ffreestanding -Wall -Wextra
+    echo "$cmsgl$cdir$inf$cmsgm$outdir$outf$cmsge"
+done
+
+# ----------------------------------------------- GRAPHICS ------------------------------------------------------------
+cdir="src/kernel/graphics/"
 for file in $cdir*.c
 do
     inf="$(basename $file)"
@@ -53,7 +70,8 @@ do
     echo "$cmsgl$cdir$inf$cmsgm$outdir$outf$cmsge"
 done
 
-# ----------------------------------------------- SYSTEMCOMMANDS ------------------------------------------------------------
+
+# ----------------------------------------------- SYSTE/MCOMMANDS ------------------------------------------------------------
 cdir="src/kernel/system/commands/"
 for file in $cdir*.c
 do

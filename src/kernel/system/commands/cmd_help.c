@@ -10,5 +10,5 @@ void CMD_METHOD_HELP(char* input, char** argv, int argc)
         if (streql(argv[1], "-s")) { cli_print_help_short(); return; }
     }
 
-   vga_writeln_fg("Invalid arguments", COL32_RED);
+   term_writeln_fg("Invalid arguments", COL32_RED);
 }
