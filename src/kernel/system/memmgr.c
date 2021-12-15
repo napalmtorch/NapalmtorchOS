@@ -78,10 +78,10 @@ void mm_print_heap(DEBUGMODE mode)
     DEBUGMODE old = debug_getmode();
     debug_setmode(mode);
 
-    debug_write_col("------ ", COL32_DARKGRAY);
-    debug_write_col("HEAP TABLE", COL32_YELLOW);
-    debug_writeln_col(" ----------------------------------------", COL32_DARKGRAY);
-    debug_writeln_col("INDEX       STATE  PTR         SIZE        BYTES", COL32_DARKGRAY);
+    debug_write_col("------ ", COL4_DARKGRAY);
+    debug_write_col("HEAP TABLE", COL4_YELLOW);
+    debug_writeln_col(" ----------------------------------------", COL4_DARKGRAY);
+    debug_writeln_col("INDEX       STATE  PTR         SIZE        BYTES", COL4_DARKGRAY);
 
     for (uint32_t i = 0; i < mm_info.count_max; i++)
     {
@@ -230,7 +230,7 @@ bool_t mm_merge_nearest()
             {
                 if ((uint32_t)mm_table[i].ptr > (uint32_t)nearest->ptr) { mm_table[i].ptr = nearest->ptr; }
                 mm_table[i].size += nearest->size;
-                mm_table[i].size_bytes += nearest->size_bytes;
+                mm_table[i].size_bytes = mm_table[i].size;
                 mm_table[i].state = MEMSTATE_FREE;
                 mm_delete_entry(nearest);
             }
@@ -247,12 +247,14 @@ bool_t mm_merge_nearest()
         {
             mm_table[0].ptr = mm_table[i].ptr;
             mm_table[0].size += mm_table[i].size;
-            mm_table[0].size_bytes += mm_table[i].size_bytes;
+            mm_table[0].size_bytes = 0;
             mm_table[0].state = MEMSTATE_FREE;
             mm_delete_entry(&mm_table[i]);
             break;
         }
     }
+
+    mm_table[0].size_bytes = mm_table[0].size;
 
     return TRUE;
 }

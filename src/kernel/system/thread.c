@@ -22,7 +22,7 @@ thread_t* thread_initial()
 }
 
 // create new thread with specified entry pointer, stack size, and arguments pointer
-thread_t* thread_create(const char* name, thread_entry_t entry, uint32_t stack_size)
+thread_t* thread_create(const char* name, thread_entry_t entry, uint32_t stack_size, void* arg)
 {
     thread_t* thread = tcalloc(sizeof(thread_t), MEMSTATE_THREAD);
 
@@ -37,7 +37,7 @@ thread_t* thread_create(const char* name, thread_entry_t entry, uint32_t stack_s
     uint32_t* s = ((uint32_t)thread->stack + (stack_size - 16));
 
     *--s = (uint32_t)thread;
-    *--s = (uint32_t)thread;
+    *--s = (uint32_t)arg;
     *--s = (uint32_t)&thread_exit;
     *--s = (uint32_t)entry;
 
@@ -52,7 +52,7 @@ thread_t* thread_create(const char* name, thread_entry_t entry, uint32_t stack_s
 void thread_exit(thread_t* thread)
 {
     register uint32_t code asm ("eax");
-    debug_info("Thread %d exited with code %d", thread->id, code);
+    term_printf("Thread %d exited with code %d\n", thread->id, code);
     thread->state = THREADSTATE_TERMINATED;
     while (TRUE);
 }

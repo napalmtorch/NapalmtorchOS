@@ -12,7 +12,7 @@ uint32_t  kernel_time, kernel_timelast;
 spinlock_t kernel_lock;
 spinlock_t idle_lock;
 
-int idle_main(thread_t* thread);
+int idle_main(void* arg);
 
 // entry point from bootstrap assembly
 void kernel_entry(uint32_t* mboot_ptr)
@@ -78,7 +78,7 @@ void kernel_before_run()
     taskmgr_init(thread_kernel);
 
     // load idle thread
-    thread_idle = thread_create("idle", &idle_main, 8192);
+    thread_idle = thread_create("idle", idle_main, 8192, 0xFFFFFFFF);
     taskmgr_ready_thread(thread_idle);
 
     // initialize keyboard
@@ -96,6 +96,7 @@ void kernel_before_run()
 void kernel_run()
 {
     spinlock_lock(&kernel_lock);
+    
     cli_monitor();
     thread_monitor(thread_kernel);
 
@@ -104,33 +105,12 @@ void kernel_run()
     {
         kernel_timelast = kernel_time;
         taskmgr_calculate_cpu_usage();
-        //sysinfo_print_info();
-
-        // create and clear strings on stack
-        char str_ktps[64];
-        char str_itps[64];
-        char temp[64];
-        memset(str_ktps, 0, 64);
-        memset(str_itps, 0, 64);
-        memset(temp, 0, 64);
-
-        // build strings
-        strcat(str_ktps, "KERNEL TPS: ");
-        strcat(str_ktps, ltoa(thread_kernel->time.ticks_per_second, temp, 10));
-        strcat(str_itps, "IDLE TPS:   ");
-        strcat(str_itps, ltoa(thread_idle->time.ticks_per_second, temp, 10));
-
-        // print string values
-        gfx_string_bg(0, vesa_get_height() - 16, "                                                                                                    ", COL32_WHITE, COL32_DARKBLUE, FONT_SLIM_8x16);
-        gfx_string_bg(0, vesa_get_height() - 32, "                                                                                                    ", COL32_WHITE, COL32_DARKBLUE, FONT_SLIM_8x16);
-        gfx_string_bg(0, vesa_get_height() - 16, str_ktps, COL32_WHITE, COL32_DARKBLUE, FONT_SLIM_8x16);
-        gfx_string_bg(0, vesa_get_height() - 32, str_itps, COL32_WHITE, COL32_DARKBLUE, FONT_SLIM_8x16);
     }
     spinlock_unlock(&kernel_lock);
 }
 
 // idle thread method
-int idle_main(thread_t* thread)
+int idle_main(void* arg)
 {
     while (TRUE)
     {

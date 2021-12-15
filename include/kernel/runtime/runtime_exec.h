@@ -21,7 +21,7 @@ typedef enum
 {
     VMSTATE_HALTED,
     VMSTATE_RUNNING,
-    VMSTATE_PAUSED,
+    VMSTATE_TERMINATED,
 } VMSTATE;
 
 typedef struct
@@ -44,8 +44,8 @@ typedef struct
     thread_t*    thread;
 } runtime_t;
 
-runtime_t runtime_create(executable_t prog);
-runtime_t runtime_create_raw(uint8_t* data, uint32_t size);
+runtime_t* runtime_create(const char* name, executable_t prog);
+runtime_t* runtime_create_raw(uint8_t* data, uint32_t size);
 bool_t    runtime_start(runtime_t* runtime);
 bool_t    runtime_stop(runtime_t* runtime);
-int       runtime_main(thread_t* thread);
+int       runtime_main(runtime_t* runtime);

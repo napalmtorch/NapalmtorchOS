@@ -60,6 +60,7 @@ void cli_register_defaults()
     cli_register(CMD_TESTTHREAD);
     cli_register(CMD_KILL);
     cli_register(CMD_CPUINFO);
+    cli_register(CMD_HEAP);
 }
 
 bool_t cli_register(cli_cmd_t cmd)
@@ -87,7 +88,7 @@ bool_t cli_unregister_byname(const char* cmd)
 
 void cli_print_caret()
 {
-   term_write_fg("root", COL32_GREEN);
+   term_write_fg("root", COL32_LIME);
    term_write("@");
    term_write_fg("/", COL32_YELLOW);
    term_write("> ");

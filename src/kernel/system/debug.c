@@ -58,7 +58,7 @@ void debug_write(const char* str)
 void debug_write_col(const char* str, uint8_t color)
 {
     if (debug_isserial()) { serial_write_col(str, color); }
-    if (debug_isterm()) { term_write_fg(str, color); }
+    if (debug_isterm()) { term_write_fg(str, color_4bpp_to_32bpp(color)); }
 }
 
 // write line
@@ -72,7 +72,7 @@ void debug_writeln(const char* str)
 void debug_writeln_col(const char* str, uint8_t color)
 {
     if (debug_isserial()) { serial_writeln_col(str, color); }
-    if (debug_isterm()) { term_writeln_fg(str, color); }
+    if (debug_isterm()) { term_writeln_fg(str, color_4bpp_to_32bpp(color)); }
 }
 
 // write formatted text with manually specified arguments
