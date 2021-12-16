@@ -32,16 +32,18 @@ void vesa_probe()
     vesa_info_t* info_ptr = (vesa_info_t*)0x80000;
     memcpy(&vesa_info, info_ptr, sizeof(vesa_info_t));
 
-    registers16_t regs;
-    regs.AX = 0x4F00;
-    regs.ES = 0x8000;
-    regs.DI = 0x0000;
-    _int_16(0x10, &regs);
+    paging_map_virtual_to_phys(32 * 1024 * 1024, vesa_mode_info.physical_base);
+
+    //registers16_t regs;
+    //regs.AX = 0x4F00;
+    //regs.ES = 0x8000;
+    //regs.DI = 0x0000;
+    //_int_16(0x10, &regs);
 
     // set properties
     vesa_width       = vesa_mode_info.width;
     vesa_height      = vesa_mode_info.height;
-    vesa_buffer      = (uint32_t*)vesa_mode_info.physical_base;
+    vesa_buffer      = 32 * 1024 * 1024; //(uint32_t*)vesa_mode_info.physical_base;
     vesa_buffer_size = vesa_width * vesa_height * 4;
 }
 

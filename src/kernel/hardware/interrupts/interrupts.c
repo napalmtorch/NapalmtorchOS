@@ -2,10 +2,10 @@
 #include <kernel/core/kernel.h>
 
 // interrupt handler function pointers
-isr_t isr_handlers[IDT_COUNT];
+isr_t isr_handlers[256];
 
 // clear interrupt handler function pointers
-void isr_clear() { for (uint32_t i = 0; i < IDT_COUNT; i++) { isr_handlers[i] = NULL; } }
+void isr_clear() { for (uint32_t i = 0; i < 256; i++) { isr_handlers[i] = NULL; } }
 
 // initialize isr interface
 void isr_init()

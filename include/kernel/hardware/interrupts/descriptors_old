@@ -4,12 +4,18 @@
 #define KERNEL_CS 0x08
 #define KERNEL_DS 0x10
 
-#define GDT_ACCESSED	0x01
-#define GDT_READWRITE	0x02
-#define GDT_DIRECTION	0x04
-#define GDT_EXEC	0x08
-#define GDT_STATIC	0x10
-#define GDT_PRESENT	0x20
+#define GDT_COUNT 5
+#define IDT_COUNT 256
+
+typedef struct
+{
+    uint16_t limit_low;
+    uint16_t base_low;
+    uint8_t  base_middle;
+    uint8_t  access;
+    uint8_t  granularity;
+    uint8_t  base_high;
+} PACKED gdt_entry_t;
 
 typedef struct
 {
@@ -26,18 +32,17 @@ typedef struct
     uint32_t base;
 } PACKED desc_ptr_t;
 
-extern void gdt_init();
-extern int gdt_set_descriptor();
-extern int gdt_add_descriptor(uint8_t id, uint64_t desc);
-extern uint64_t gdt_create_descriptor(uint32_t base, uint32_t limit, uint16_t flag);
-
+extern void gdt_flush(uint32_t val);
 extern void idt_flush(uint32_t val);
 
+void gdt_init();
 void idt_init();
+void gdt_set();
 void idt_set_isrs();
 void idt_set_irqs();
-void idt_set_descriptor(uint32_t num, uint32_t base, uint16_t sel, uint8_t flags);
 
+void gdt_set_descriptor(uint32_t num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran);
+void idt_set_descriptor(uint32_t num, uint32_t base, uint16_t sel, uint8_t flags);
 
 extern void isr0();
 extern void isr1();

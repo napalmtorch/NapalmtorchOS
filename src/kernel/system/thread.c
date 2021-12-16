@@ -49,6 +49,33 @@ thread_t* thread_create(const char* name, thread_entry_t entry, uint32_t stack_s
     return thread;
 }
 
+thread_t* thread_create_ext(const char* name, uint8_t* prog_data, uint32_t prog_size, uint32_t stack_size, void* arg)
+{
+    thread_t* thread = tcalloc(sizeof(thread_t), MEMSTATE_THREAD);
+
+    // copy name
+    for (uint32_t i = 0; i < strlen(name); i++) { if (i < 64) { thread->name[i] = name[i]; } }
+    
+    thread->id = thread_cid++;
+    thread->stack = calloc(stack_size);
+    thread->stack_size = stack_size;
+    thread->state = THREADSTATE_HALTED;
+    thread->runtime = NULL;
+
+    uint32_t* s = ((uint32_t)thread->stack + (stack_size - 16));
+
+    *--s = (uint32_t)thread;
+    *--s = (uint32_t)arg;
+    *--s = (uint32_t)thread_exit;
+    *--s = (uint32_t)prog_data;
+
+    thread->registers.esp    = (uint32_t)s;
+    thread->registers.ebp    = 0;
+    thread->registers.eflags = 0x200;
+    debug_info("Created external thread: ID = %d, ESP: 0x%8x, PROG: 0x%8x PROG_SIZE: %d bytes", thread->id, thread->registers.esp, (uint32_t)prog_data, prog_size);
+    return thread;
+}
+
 // on thread exit
 void thread_exit(thread_t* thread)
 {

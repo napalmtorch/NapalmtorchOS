@@ -15,6 +15,7 @@
 #include <kernel/hardware/common/pit.h>
 #include <kernel/hardware/common/rtc.h>
 #include <kernel/hardware/common/realmode.h>
+#include <kernel/hardware/common/paging.h>
 #include <kernel/hardware/devices/video/vga.h>
 #include <kernel/hardware/devices/video/vesa.h>
 #include <kernel/hardware/devices/input/keyboard_ps2.h>

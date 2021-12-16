@@ -27,7 +27,7 @@ mboot:
 
 section .bss
 stack_bottom:
-    resb 4 * 1024 * 1024
+    resb 512 * 1024
 stack_top:
 
 section .text
@@ -46,3 +46,35 @@ enable_a20:
     or al, 2
     out 0x92, al
     ret
+
+[GLOBAL set_gdtr]
+set_gdtr:
+    push EBP
+    mov EBP, ESP
+
+    lgdt [0x800]
+
+    mov ESP, EBP
+    pop EBP
+    ret
+
+[GLOBAL reload_segments]
+reload_segments:
+    push EBP
+    mov EBP, ESP
+
+    push EAX
+    mov AX, 0x10
+    mov DS, AX
+    mov ES, AX
+    mov FS, AX
+    mov GS, AX
+    mov SS, AX
+    pop EAX
+
+    jmp 0x8:reload_segments_end
+reload_segments_end:
+    mov ESP, EBP
+    pop EBP
+    ret
+    

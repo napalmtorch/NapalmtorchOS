@@ -1,7 +1,9 @@
 #pragma once
 #include <lib/types.h>
 #include <kernel/graphics/graphics.h>
+#include <kernel/system/service.h>
 
+void term_start(service_t* service);
 void term_init();
 
 void term_clear();

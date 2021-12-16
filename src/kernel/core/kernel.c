@@ -42,23 +42,27 @@ void kernel_boot()
     // initialize interrupt services routines
     isr_init();
 
+    paging_init();
+
     // read multiboot and initialize memory manager
     mboot_read();
-    mm_init();
-    
+    mm_init();  
 
     // initialize service manager
     service_initmgr();
 
     // initialize vesa driver
     vesa_identify();
+    debug_info("VESA STARTED");
 
     // initialize terminal
     term_init();
+    //term_start(NULL);
+    term_writeln("Hello world!");
 
     // initialize ata
-    atapio_init();
-    fs_mount();
+    //atapio_init();
+    //fs_mount();
 
     // initialize rtc and pit interrupts
     rtc_init();
