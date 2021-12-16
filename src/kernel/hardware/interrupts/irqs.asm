@@ -135,6 +135,7 @@ ts_common_stub:
 
 global syscall_common_stub:function syscall_common_stub.end-syscall_common_stub
 syscall_common_stub:
+    xchg bx, bx
     pushad                  ; push general purpose registers
 
     mov AX, DS              ; load data segment into ax

@@ -18,7 +18,7 @@ bool_t elf_probe(uint8_t* buffer)
     return FALSE;
 }
 
-uint8_t elf_start(uint8_t* buffer, elf_priv_data* priv)
+uint8_t elf_start(uint8_t* buffer, uint32_t buffer_size, elf_priv_data* priv)
 {
     if (!elf_probe(buffer)) { return FALSE; }
     elf_header_t *header = (elf_header_t *)buffer;
@@ -33,6 +33,7 @@ uint8_t elf_start(uint8_t* buffer, elf_priv_data* priv)
 		return 0;
 	}
 
+	uint8_t* prog = tcalloc(buffer_size + 0x1000, MEMSTATE_ARRAY);
 
 	elf_program_header_t *ph = (elf_program_header_t *)(buffer + header->e_phoff);
 	for(int i = 0; i < header->e_phnum; i++, ph++)
@@ -45,8 +46,8 @@ uint8_t elf_start(uint8_t* buffer, elf_priv_data* priv)
                 uint8_t* phys_loc = tcalloc(ph->p_filesz, MEMSTATE_ARRAY);
 		 		debug_info("LOAD: offset 0x%x vaddr 0x%x paddr 0x%x filesz 0x%x memsz 0x%x",
 		 				ph->p_offset, ph->p_vaddr, ph->p_paddr, ph->p_filesz, ph->p_memsz);
-		 		//paging_map_virtual_to_phys(ph->p_vaddr, phys_loc);
-		 		//memcpy(ph->p_vaddr, buffer + ph->p_offset, ph->p_filesz);
+		 		paging_map_virtual_to_phys(ph->p_vaddr, prog);
+		 		memcpy(ph->p_vaddr, buffer + ph->p_offset, ph->p_filesz);
 		 		break;
             }
 		 	default:
@@ -57,13 +58,13 @@ uint8_t elf_start(uint8_t* buffer, elf_priv_data* priv)
 		 }
 	}
 
-    thread_t* thread = thread_create_ext("program", header->e_entry, 0, 0x10000, 0);
-    term_printf("Running external program");
+    thread_t* thread = thread_create_ext("program", (uint8_t*)header->e_entry, ph->p_filesz, 0x20000, 0);
+    term_writeln("Running external program");
     taskmgr_ready_thread(thread);
     return TRUE;
 }
 
 void elf_init()
 {
-
+	
 }

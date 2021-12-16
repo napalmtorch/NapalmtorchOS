@@ -61,8 +61,10 @@ void kernel_boot()
     term_writeln("Hello world!");
 
     // initialize ata
-    //atapio_init();
-    //fs_mount();
+    atapio_init();
+    fs_mount();
+
+    debug_info("TERM FUNC: 0x%8x", (uint32_t)term_writeln_col);
 
     // initialize rtc and pit interrupts
     rtc_init();
@@ -86,6 +88,10 @@ void kernel_before_run()
     // load idle thread
     thread_idle = thread_create("idle", idle_main, 8192, 0xFFFFFFFF);
     taskmgr_ready_thread(thread_idle);
+
+    uint32_t* len = 0;
+    uint8_t* prog_data = vfs_read_bytes("/program.app", &len);
+    elf_start(prog_data, sizeof(prog_data), NULL);
 
     // initialize keyboard
     kbps2_init();

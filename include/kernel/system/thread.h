@@ -20,6 +20,7 @@ typedef int (*thread_entry_t)(void*);
 typedef struct
 {
     uint32_t esp, ebp, eax, ebx, ecx, edx, esi, edi, eflags;
+    uint32_t ds, es, fs, gs;
 } PACKED thread_regs_t;
 
 typedef struct

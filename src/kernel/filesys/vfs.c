@@ -117,7 +117,10 @@ uint32_t vfs_count_files(const char* path)
         for (uint32_t i = 0; i < ATA_SECTOR_SIZE; i += sizeof(fs_file_t))
         {
             fs_file_t* tempfile = (fs_file_t*)(secdata + i);
-            if (tempfile->type == FSTYPE_FILE && tempfile->parent_index == index) { dirs_count++; }
+            if (tempfile->type == FSTYPE_FILE && tempfile->parent_index == index) 
+            { 
+                dirs_count++; 
+            }
         }
     }
     free(secdata);
@@ -133,7 +136,7 @@ char** vfs_get_dirs(const char* path, int* count)
     int index = fs_get_dir_index(dir);
 
     uint32_t dir_count = vfs_count_dirs(path);
-    if (dir_count == 0) { return NULL; }
+    if (dir_count == 0) { debug_printf("No directories found\n"); return NULL; }
     char** output = (char**)calloc(sizeof(char*) * dir_count);
     int output_index = 0;
 
@@ -169,6 +172,7 @@ char** vfs_get_files(const char* path, int* count)
     int index = fs_get_dir_index(dir);
 
     uint32_t file_count = vfs_count_files(path);
+    if (file_count == 0) { debug_printf("No files found\n"); return NULL; }
     char** output = (char**)calloc(sizeof(char*) * file_count);
     int output_index = 0;
 

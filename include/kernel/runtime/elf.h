@@ -51,4 +51,4 @@ typedef struct
 } elf_program_header_t;
 
 void elf_init();
-uint8_t elf_start(uint8_t* buffer, elf_priv_data* priv);
+uint8_t elf_start(uint8_t* buffer, uint32_t buffer_size, elf_priv_data* priv);

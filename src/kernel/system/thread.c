@@ -72,7 +72,8 @@ thread_t* thread_create_ext(const char* name, uint8_t* prog_data, uint32_t prog_
     thread->registers.esp    = (uint32_t)s;
     thread->registers.ebp    = 0;
     thread->registers.eflags = 0x200;
-    debug_info("Created external thread: ID = %d, ESP: 0x%8x, PROG: 0x%8x PROG_SIZE: %d bytes", thread->id, thread->registers.esp, (uint32_t)prog_data, prog_size);
+    thread->registers.ds     = 0x10;
+    debug_info("Created external thread: ID = %d, ESP: 0x%8x, PROG: 0x%8x PROG_SIZE: 0x%8x", thread->id, thread->registers.esp, (uint32_t)prog_data, prog_size);
     return thread;
 }
 

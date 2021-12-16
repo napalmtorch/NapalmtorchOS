@@ -136,7 +136,7 @@ void fs_info_write()
         if (sec_contains) { index = sec; }
     }
     free(data);
-    fs_info.file_table_max_used = index;
+    fs_info.file_table_max_used = index + 1;
     
     memcpy(sec, &fs_info, sizeof(fs_info_t));
 
@@ -570,7 +570,7 @@ bool_t fs_root_create(const char* label)
 {
     strcpy(fs_rootdir.name, label);
     fs_rootdir.status = 0xFF;
-    fs_rootdir.parent_index = UINT32_MAX;
+    fs_rootdir.parent_index = 0;
     fs_rootdir.type = FSTYPE_DIR;
     memsetl(fs_rootdir.padding, 0, sizeof(fs_rootdir.padding));
     fs_filetable_write_dir(0, fs_rootdir);
@@ -894,6 +894,7 @@ fs_file_t fs_get_file_byname(const char* path)
 
     int args_count = 0;
     char** args = strsplit(path, '/', &args_count);
+    debug_info("GETTING FILE: %s", path);
 
     if (args_count == 0) { freearray(args, args_count); debug_printf("Args was null while getting file by name\n"); return NULL_FILE; }
 

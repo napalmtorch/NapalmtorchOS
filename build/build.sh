@@ -193,5 +193,17 @@ cp 'build/grub.cfg' 'bin/isodir/boot/grub/grub.cfg'
 grub-mkrescue -o  'napalm_os.iso' 'bin/isodir'
 cp 'napalm_os.iso' 'napalm_os_flp.img'
 
+# compile user-mode applications
+i686-elf-gcc "disk/test.c" -o "disk/program.app" -nostdlib -ffreestanding -Wall -Wextra
+
+#nasm -felf32 "disk/entry.asm" -o "disk/entry.o"
+
+#i686-elf-ld -T "disk/linker.ld" -o "disk/program.app" "disk/entry.o" "disk/test.o"
+#i686-elf-ld -T "disk/linker.ld" -o "disk/program.app" "disk/test.o" "disk/start.o"
+
+
+# create disk image
+./fsmgr "makedisk"
+
 # Run QEMU instance of operating system
 qemu-system-i386 -m 1024M -vga std -hda 'hdd.img' -cdrom 'napalm_os.iso' -serial stdio -boot d -soundhw ac97 -enable-kvm -rtc base=localtime -cpu host

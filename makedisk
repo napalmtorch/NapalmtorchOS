@@ -1,0 +1,9 @@
+newimg 536870912
+format
+
+infile /program.app disk/program.app
+
+saveimg ./hdd.img
+blocks
+entries
+exit

@@ -65,7 +65,13 @@ void pit_handler(registers_t* regs)
 
 void syscall_handler(registers_t* regs)
 {
+    debug_info("SYSTEM CALL: A = 0x%8x, B = 0x%8x, C = 0x%8x, D = 0x%8x", regs->eax, regs->ebx, regs->ecx, regs->edx);
+
     // send eio
     port_outb(PIC_MASTER_CMD, PIC_EOI);
-    debug_info("SYSTEM CALL");
+    
+    if (regs->eax == 0x01)
+    {
+        term_write((char*)regs->ebx);
+    }
 }

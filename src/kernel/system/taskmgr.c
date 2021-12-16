@@ -118,11 +118,6 @@ void taskmgr_schedule()
     if (taskmgr_next->state == THREADSTATE_HALTED) { taskmgr_schedule(); return; }
     else if (taskmgr_next->state == THREADSTATE_TERMINATED)
     {
-        if (taskmgr_next->runtime != NULL)
-        {
-            runtime_dispose(taskmgr_next->runtime);
-        }
-
         term_printf("Thread %d exited with code %d\n", taskmgr_next->id, taskmgr_next->exit_code);
         serial_printf("Thread %d exited with code %d\n", taskmgr_next->id, taskmgr_next->exit_code);
         free(taskmgr_next->stack);
