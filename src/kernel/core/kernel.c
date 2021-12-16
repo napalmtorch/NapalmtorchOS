@@ -52,7 +52,6 @@ void kernel_boot()
 
     // initialize vesa driver
     vesa_identify();
-    vesa_setmode(1280, 720);
 
     // initialize terminal
     term_init();

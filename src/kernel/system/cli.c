@@ -64,6 +64,8 @@ void cli_register_defaults()
     cli_register(CMD_MEMINFO);
     cli_register(CMD_HEAP);
     cli_register(CMD_RUN);
+    cli_register(CMD_VMODE);
+    cli_register(CMD_SYSCALL);
 
     cli_register(CMD_LS);
     cli_register(CMD_VIEW);

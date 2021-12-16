@@ -62,3 +62,10 @@ void pit_handler(registers_t* regs)
     // perform thread scheduling
     taskmgr_schedule();
 }
+
+void syscall_handler(registers_t* regs)
+{
+    // send eio
+    port_outb(PIC_MASTER_CMD, PIC_EOI);
+    debug_info("SYSTEM CALL");
+}

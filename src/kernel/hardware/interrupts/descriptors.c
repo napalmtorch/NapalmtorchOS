@@ -129,6 +129,8 @@ void idt_set_irqs()
     idt_set_descriptor(45, (uint32_t)irq13, KERNEL_CS, IDT_FLAG);
     idt_set_descriptor(46, (uint32_t)irq14, KERNEL_CS, IDT_FLAG);
     idt_set_descriptor(47, (uint32_t)irq15, KERNEL_CS, IDT_FLAG);
+
+    idt_set_descriptor(128, (uint32_t)irq_syscall, KERNEL_CS, IDT_FLAG);
 }
 
 // set interrupt descriptor table entry properties

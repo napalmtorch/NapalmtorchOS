@@ -39,3 +39,4 @@ void irq_unregister(uint8_t num);
 void isr_handler(registers_t* regs);
 void irq_handler(registers_t* regs);
 void pit_handler(registers_t* regs);
+void syscall_handler(registers_t* regs);
