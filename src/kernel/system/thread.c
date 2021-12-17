@@ -22,7 +22,7 @@ thread_t* thread_initial()
 }
 
 // create new thread with specified entry pointer, stack size, and arguments pointer
-thread_t* thread_create(const char* name, thread_entry_t entry, uint32_t stack_size, void* arg)
+thread_t* thread_create(const char* name, thread_entry_t entry, uint32_t stack_size, char** argv, int argc)
 {
     thread_t* thread = tcalloc(sizeof(thread_t), MEMSTATE_THREAD);
 
@@ -37,7 +37,7 @@ thread_t* thread_create(const char* name, thread_entry_t entry, uint32_t stack_s
     uint32_t* s = ((uint32_t)thread->stack + (stack_size - 16));
 
     *--s = (uint32_t)thread;
-    *--s = (uint32_t)arg;
+    *--s = (uint32_t)argv;
     *--s = (uint32_t)thread_exit;
     *--s = (uint32_t)entry;
 
@@ -48,7 +48,7 @@ thread_t* thread_create(const char* name, thread_entry_t entry, uint32_t stack_s
     return thread;
 }
 
-thread_t* thread_create_ext(const char* name, uint8_t* prog_data, uint32_t prog_size, uint32_t stack_size, void* arg)
+thread_t* thread_create_ext(const char* name, uint8_t* prog_data, uint32_t prog_size, uint32_t stack_size, char** argv, int argc)
 {
     thread_t* thread = tcalloc(sizeof(thread_t), MEMSTATE_THREAD);
 
@@ -63,7 +63,7 @@ thread_t* thread_create_ext(const char* name, uint8_t* prog_data, uint32_t prog_
     uint32_t* s = ((uint32_t)thread->stack + (stack_size - 16));
 
     *--s = (uint32_t)thread;
-    *--s = (uint32_t)arg;
+    *--s = (uint32_t)argv;
     *--s = (uint32_t)thread_exit;
     *--s = (uint32_t)prog_data;
 

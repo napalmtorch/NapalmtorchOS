@@ -4,7 +4,7 @@
 
 void CMD_METHOD_RUN(char* input, char** argv, int argc)
 {
-    uint32_t* len = 0;
-    uint8_t* prog_data = vfs_read_bytes(input + 4, &len);
-    elf_start(prog_data + 128, len, NULL);
+    process_t* proc = procmgr_load_file(argv[1]);
+    if (proc == NULL) { return; }
+    procmgr_start(proc);
 }

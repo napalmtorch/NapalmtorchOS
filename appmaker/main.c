@@ -26,6 +26,7 @@ int main(int argc, char** argv)
     strcpy(header.name, "Demo Program");
     parse_program(argv[1], header);
     save_output(argv[2]);
+    printf("Finished converting elf program\n");
     return 0;
 }
 
@@ -53,11 +54,13 @@ void parse_program(const char* filename, header_t header)
 void add_header(uint8_t* elf_data, uint32_t size, header_t header)
 {
     if (output_data != NULL) { free(output_data); }
-    output_data = malloc(size + sizeof(header_t));
+    output_size = size + sizeof(header_t) + 4;
+    output_data = malloc(output_size);
     memset(output_data, 0, size + sizeof(header_t));
     memset(header.reserved, 0, sizeof(header.reserved));
     header.signature = 0xBAD0A515;
 
+    memcpy(output_data, &header, sizeof(header_t));
     memcpy(output_data + sizeof(header_t), elf_data, size);
 }
 

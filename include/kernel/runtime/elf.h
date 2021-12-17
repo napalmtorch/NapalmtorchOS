@@ -1,5 +1,6 @@
 #pragma once
 #include <lib/types.h>
+#include <kernel/runtime/process.h>
 
 typedef struct 
 {
@@ -51,4 +52,5 @@ typedef struct
 } elf_program_header_t;
 
 void* elf_map_methods();
+bool_t elf_attach(process_t* proc);
 uint8_t elf_start(uint8_t* buffer, uint32_t buffer_size, elf_priv_data* priv);

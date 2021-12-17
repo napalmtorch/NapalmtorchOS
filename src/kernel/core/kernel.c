@@ -9,7 +9,7 @@ thread_t* thread_kernel;
 thread_t* thread_idle;
 uint32_t  kernel_time, kernel_timelast;
 
-int idle_main(void* arg);
+int idle_main(char** argv, int argc);
 
 // entry point from bootstrap assembly
 void kernel_entry(uint32_t* mboot_ptr)
@@ -20,6 +20,7 @@ void kernel_entry(uint32_t* mboot_ptr)
     // boot sequence
     kernel_boot();
     kernel_before_run();
+    debug_setmode(DEBUGMODE_ALL);
 
     // main loop
     while (TRUE)
@@ -82,7 +83,7 @@ void kernel_before_run()
     taskmgr_init(thread_kernel);
 
     // load idle thread
-    thread_idle = thread_create("idle", idle_main, 8192, 0xFFFFFFFF);
+    thread_idle = thread_create("idle", idle_main, 8192, NULL, 0);
     taskmgr_ready_thread(thread_idle);
 
     // initialize keyboard
@@ -93,6 +94,7 @@ void kernel_before_run()
     cli_print_caret();
 
     // start task manager and enable interrupts
+    procmgr_init();
     taskmgr_start();
     sti();
 }
@@ -103,6 +105,7 @@ void kernel_run()
     
     cli_monitor();
     thread_monitor(thread_kernel);
+    procmgr_monitor();
 
     kernel_time = pit_get_seconds_total();
     if (kernel_time != kernel_timelast)
@@ -114,7 +117,7 @@ void kernel_run()
 }
 
 // idle thread method
-int idle_main(void* arg)
+int idle_main(char** argv, int argc)
 {
     while (TRUE)
     {

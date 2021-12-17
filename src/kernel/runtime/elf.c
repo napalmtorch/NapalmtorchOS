@@ -19,6 +19,14 @@ void* elf_map_methods()
 	method_table[5] = (uint32_t)term_clear_col;
 	method_table[6] = (uint32_t)term_writechar_col;
 	method_table[7] = (uint32_t)term_write_col;
+	method_table[8] = (uint32_t)term_putchar;
+
+	method_table[9]  = (uint32_t)term_set_cursor;
+	method_table[10] = (uint32_t)term_set_colors;
+	method_table[11] = (uint32_t)term_get_cursor_x;
+	method_table[12] = (uint32_t)term_get_cursor_y;
+	method_table[13] = (uint32_t)term_get_fg;
+	method_table[14] = (uint32_t)term_get_bg;
 
 	return method_table;
 }
@@ -40,20 +48,50 @@ bool_t elf_probe(uint8_t* buffer)
     return FALSE;
 }
 
+bool_t elf_attach(process_t* proc)
+{
+	if (proc == NULL) { debug_error("Tried to attach elf executable to null process"); return FALSE; }
+
+	uint8_t* elf_start = proc->data + sizeof(program_header_t);
+
+	if (!elf_probe(proc->data + sizeof(program_header_t))) { return FALSE; }
+    elf_header_t *header = (elf_header_t*)elf_start;
+
+	if(header->e_type != 2) { debug_info("File is not executable, type = 0x%2x", header->e_type); return 0; }
+
+	uint8_t* prog = tcalloc(proc->size + 0x1000, MEMSTATE_ARRAY);
+
+	elf_program_header_t *ph = (elf_program_header_t *)(elf_start + header->e_phoff);
+	for(int i = 0; i < header->e_phnum; i++, ph++)
+	{
+		switch(ph->p_type)
+		 {
+		 	case 0: { break; }
+		 	case 1:
+            {
+                uint8_t* phys_loc = tcalloc(ph->p_filesz, MEMSTATE_ARRAY);
+		 		paging_map(ph->p_vaddr, prog);
+		 		memcpy(ph->p_vaddr, elf_start + ph->p_offset, ph->p_filesz);
+		 		break;
+            }
+		 	default:
+            {
+                debug_error("Unsupported ELF type");
+                return 0;
+            }
+		 }
+	}
+
+    proc->thread = thread_create_ext(proc->name, (uint8_t*)header->e_entry, ph->p_filesz, 0x20000, NULL, 0);
+    return TRUE;
+}
+
 uint8_t elf_start(uint8_t* buffer, uint32_t buffer_size, elf_priv_data* priv)
 {
     if (!elf_probe(buffer)) { return FALSE; }
     elf_header_t *header = (elf_header_t *)buffer;
-	debug_info("Type: %s%s%s\n",
-		header->e_ident[4] == 1 ? "32bit ":"64 bit",
-		header->e_ident[5] == 1 ? "Little Endian ":"Big endian ",
-		header->e_ident[6] == 1 ? "True ELF ":"buggy ELF ");
 
-	if(header->e_type != 2)
-	{
-		debug_info("File is not executable!, type = 0x%2x", header->e_type);
-		return 0;
-	}
+	if(header->e_type != 2) { debug_info("File is not executable, type = 0x%2x", header->e_type); return 0; }
 
 	uint8_t* prog = tcalloc(buffer_size + 0x1000, MEMSTATE_ARRAY);
 
@@ -66,22 +104,19 @@ uint8_t elf_start(uint8_t* buffer, uint32_t buffer_size, elf_priv_data* priv)
 		 	case 1:
             {
                 uint8_t* phys_loc = tcalloc(ph->p_filesz, MEMSTATE_ARRAY);
-		 		debug_info("LOAD: offset 0x%x vaddr 0x%x paddr 0x%x filesz 0x%x memsz 0x%x",
-		 				ph->p_offset, ph->p_vaddr, ph->p_paddr, ph->p_filesz, ph->p_memsz);
 		 		paging_map(ph->p_vaddr, prog);
 		 		memcpy(ph->p_vaddr, buffer + ph->p_offset, ph->p_filesz);
 		 		break;
             }
 		 	default:
             {
-                debug_error("Unsupported p_type! Bail out!");
+                debug_error("Unsupported type");
                 return 0;
             }
 		 }
 	}
 
-    thread_t* thread = thread_create_ext("program", (uint8_t*)header->e_entry, ph->p_filesz, 0x20000, 0);
-    term_writeln("Running external program");
+    thread_t* thread = thread_create_ext("program", (uint8_t*)header->e_entry, ph->p_filesz, 0x20000, NULL, 0);
     taskmgr_ready_thread(thread);
     return TRUE;
 }

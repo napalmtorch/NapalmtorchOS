@@ -194,7 +194,8 @@ grub-mkrescue -o  'napalm_os.iso' 'bin/isodir'
 cp 'napalm_os.iso' 'napalm_os_flp.img'
 
 # compile user-mode applications
-i686-elf-gcc -Idisk -o "disk/sys/bin/demo.app" "disk/sys/src/demo.c" "disk/sys/src/library.c" -nostdlib -ffreestanding -Wall -Wextra
+i686-elf-gcc -Idisk -o "disk/sys/bin/demo.elf" "disk/sys/src/demo.c" "disk/sys/src/library.c" -nostdlib -ffreestanding -Wall -Wextra
+./appmaker.o "disk/sys/bin/demo.elf" "disk/sys/bin/demo.app"
 
 # create disk image
 ./fsmgr "makedisk"

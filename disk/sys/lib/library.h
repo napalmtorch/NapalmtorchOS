@@ -54,8 +54,22 @@ static inline bool_t bit_address_from_byte(uint32_t to_convert, int to_return)
 void lib_init();
 
 void term_clear_col(uint32_t bg);
+void term_writechar(char c);
+void term_writechar_fg(char c, uint32_t fg);
 void term_writechar_col(char c, uint32_t fg, uint32_t bg);
-void term_write_col(const char* str, uint32_t fg, uint32_t bg);
+void term_write(const char* txt);
+void term_write_fg(const char* txt, uint32_t fg);
+void term_write_col(const char* txt, uint32_t fg, uint32_t bg);
+void term_writeln(const char* txt);
+void term_writeln_fg(const char* txt, uint32_t fg);
+void term_writeln_col(const char* txt, uint32_t fg, uint32_t bg);
+void term_putchar(int x, int y, char c, uint32_t fg, uint32_t bg);
+void term_set_cursor(int x, int y);
+void term_set_colors(uint32_t fg, uint32_t bg);
+int  term_get_cursor_x();
+int  term_get_cursor_y();
+uint32_t term_get_fg();
+uint32_t term_get_bg();
 
 void* malloc(size_t size);
 void* calloc(size_t size);

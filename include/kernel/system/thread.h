@@ -47,6 +47,6 @@ typedef struct
 extern void switch_thread();
 
 thread_t* thread_initial();
-thread_t* thread_create(const char* name, thread_entry_t entry, uint32_t stack_size, void* arg);
-thread_t* thread_create_ext(const char* name, uint8_t* prog_data, uint32_t prog_size, uint32_t stack_size, void* arg);
+thread_t* thread_create(const char* name, thread_entry_t entry, uint32_t stack_size, char** argv, int argc);
+thread_t* thread_create_ext(const char* name, uint8_t* prog_data, uint32_t prog_size, uint32_t stack_size, char** argv, int argc);
 void      thread_monitor(thread_t* thread);

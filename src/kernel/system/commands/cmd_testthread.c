@@ -3,7 +3,7 @@
 
 spinlock_t test_lock;
 
-int thread_test(void* arg)
+int thread_test(char** argv, int argc)
 {
     spinlock_lock(&test_lock);
     term_printf("Hello world\n");
@@ -14,6 +14,6 @@ int thread_test(void* arg)
 
 void CMD_METHOD_TESTTHREAD(char* input, char** argv, int argc)
 {
-    thread_t* thread = thread_create("test", thread_test, 8192, 0);
+    thread_t* thread = thread_create("test", thread_test, 8192, NULL, 0);
     taskmgr_ready_thread(thread);
 }

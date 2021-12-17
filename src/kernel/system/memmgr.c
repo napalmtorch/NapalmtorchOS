@@ -159,6 +159,7 @@ void mm_free(void* ptr)
 
         if (mm_table[i].ptr == ptr)
         {
+            memset(mm_table[i].ptr, 0, mm_table[i].size);
             mm_table[i].state = MEMSTATE_FREE;
             mm_info.data_used -= mm_table[i].size;
             mm_print_free(&mm_table[i]);

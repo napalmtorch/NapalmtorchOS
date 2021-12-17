@@ -26,8 +26,8 @@ infile /sys/lib/library.h disk/sys/lib/library.h
 infile /sys/src/demo.c disk/sys/src/demo.c
 infile /sys/src/library.c disk/sys/src/library.c
 
+infile /sys/bin/demo.elf disk/sys/bin/demo.elf
 infile /sys/bin/demo.app disk/sys/bin/demo.app
-infile /sys/bin/test.app disk/sys/bin/test.app
 
 saveimg ./hdd.img
 blocks
