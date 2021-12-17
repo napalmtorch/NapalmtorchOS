@@ -25,14 +25,13 @@
 #include <kernel/system/taskmgr.h>
 #include <kernel/system/thread.h>
 #include <kernel/system/sysinfo.h>
+#include <kernel/system/syscall.h>
 #include <kernel/system/service.h>
 #include <kernel/system/terminal.h>
 #include <kernel/system/cli.h>
 #include <kernel/filesys/filesys.h>
 #include <kernel/filesys/vfs.h>
-#include <kernel/runtime/runtime_exec.h>
-#include <kernel/runtime/runtime_mem.h>
-#include <kernel/runtime/runtime_isa.h>
+#include <kernel/runtime/elf.h>
 
 extern uint32_t kernel_size;
 

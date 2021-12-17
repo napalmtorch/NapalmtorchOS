@@ -1,6 +1,28 @@
 #include <kernel/runtime/elf.h>
 #include <kernel/core/kernel.h>
 
+bool_t method_table_loaded = FALSE; 
+void** method_table = NULL;
+
+void* elf_map_methods()
+{
+	if (method_table_loaded) { return method_table; }
+
+	method_table = tcalloc(4096 * sizeof(void*), MEMSTATE_PTRARRAY);
+	
+	method_table[0] = (uint32_t)mm_allocate;
+	method_table[1] = (uint32_t)mm_free;
+	method_table[2] = (uint32_t)mm_amount_installed;
+	method_table[3] = (uint32_t)mm_amount_reserved;
+	method_table[4] = (uint32_t)mm_amount_used;
+
+	method_table[5] = (uint32_t)term_clear_col;
+	method_table[6] = (uint32_t)term_writechar_col;
+	method_table[7] = (uint32_t)term_write_col;
+
+	return method_table;
+}
+
 bool_t elf_identify(elf_header_t* header)
 {
     if (header->e_ident[0] == 0x7F && header->e_ident[1] == 'E' && header->e_ident[2] == 'L' && header->e_ident[3] == 'F') { return TRUE; }
@@ -46,7 +68,7 @@ uint8_t elf_start(uint8_t* buffer, uint32_t buffer_size, elf_priv_data* priv)
                 uint8_t* phys_loc = tcalloc(ph->p_filesz, MEMSTATE_ARRAY);
 		 		debug_info("LOAD: offset 0x%x vaddr 0x%x paddr 0x%x filesz 0x%x memsz 0x%x",
 		 				ph->p_offset, ph->p_vaddr, ph->p_paddr, ph->p_filesz, ph->p_memsz);
-		 		paging_map_virtual_to_phys(ph->p_vaddr, prog);
+		 		paging_map(ph->p_vaddr, prog);
 		 		memcpy(ph->p_vaddr, buffer + ph->p_offset, ph->p_filesz);
 		 		break;
             }
@@ -62,9 +84,4 @@ uint8_t elf_start(uint8_t* buffer, uint32_t buffer_size, elf_priv_data* priv)
     term_writeln("Running external program");
     taskmgr_ready_thread(thread);
     return TRUE;
-}
-
-void elf_init()
-{
-	
 }

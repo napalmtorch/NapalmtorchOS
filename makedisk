@@ -1,7 +1,33 @@
 newimg 536870912
 format
 
-infile /program.app disk/program.app
+mkdir /sys
+mkdir /sys/bin
+mkdir /sys/lib
+mkdir /sys/src
+
+mkdir /sys/resources
+mkdir /sys/resources/fonts
+mkdir /sys/resources/themes
+mkdir /sys/resources/wallpapers
+
+mkdir /users
+
+mkdir /users/root
+mkdir /users/root/documents
+mkdir /users/root/pictures
+
+mkdir /users/public
+mkdir /users/public/documents
+mkdir /users/public/pictures
+
+infile /sys/lib/library.h disk/sys/lib/library.h
+
+infile /sys/src/demo.c disk/sys/src/demo.c
+infile /sys/src/library.c disk/sys/src/library.c
+
+infile /sys/bin/demo.app disk/sys/bin/demo.app
+infile /sys/bin/test.app disk/sys/bin/test.app
 
 saveimg ./hdd.img
 blocks

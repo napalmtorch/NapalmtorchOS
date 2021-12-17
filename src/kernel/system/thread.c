@@ -33,7 +33,6 @@ thread_t* thread_create(const char* name, thread_entry_t entry, uint32_t stack_s
     thread->stack = calloc(stack_size);
     thread->stack_size = stack_size;
     thread->state = THREADSTATE_HALTED;
-    thread->runtime = NULL;
 
     uint32_t* s = ((uint32_t)thread->stack + (stack_size - 16));
 
@@ -43,7 +42,7 @@ thread_t* thread_create(const char* name, thread_entry_t entry, uint32_t stack_s
     *--s = (uint32_t)entry;
 
     thread->registers.esp    = (uint32_t)s;
-    thread->registers.ebp    = 0; //(uint32_t)thread->stack + thread->stack_size;
+    thread->registers.ebp    = 0;
     thread->registers.eflags = 0x200;
     debug_info("Created thread: ID = %d, ESP: 0x%8x, ENTRY: 0x%8x", thread->id, thread->registers.esp, (uint32_t)entry);
     return thread;
@@ -60,7 +59,6 @@ thread_t* thread_create_ext(const char* name, uint8_t* prog_data, uint32_t prog_
     thread->stack = calloc(stack_size);
     thread->stack_size = stack_size;
     thread->state = THREADSTATE_HALTED;
-    thread->runtime = NULL;
 
     uint32_t* s = ((uint32_t)thread->stack + (stack_size - 16));
 

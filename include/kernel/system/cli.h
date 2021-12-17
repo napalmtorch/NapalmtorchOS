@@ -25,7 +25,6 @@ void CMD_METHOD_HEAP(char* input, char** argv, int argc);
 void CMD_METHOD_RUN(char* input, char** argv, int argc);
 void CMD_METHOD_VMODE(char* input, char** argv, int argc);
 void CMD_METHOD_SYSCALL(char* input, char** argv, int argc);
-void CMD_METHOD_RUNEXT(char* input, char** argv, int argc);
 
 void CMD_METHOD_LS(char* input, char** argv, int argc);
 void CMD_METHOD_VIEW(char* input, char** argv, int argc);
@@ -42,7 +41,6 @@ static const cli_cmd_t CMD_HEAP         = { "HEAP", "Show list of heap allocatio
 static const cli_cmd_t CMD_RUN          = { "RUN", "Load an executable program", "run [path] [args]", CMD_METHOD_RUN };
 static const cli_cmd_t CMD_VMODE        = { "VMODE", "Set the current video mode", "vmode [w] [h]", CMD_METHOD_VMODE };
 static const cli_cmd_t CMD_SYSCALL      = { "SYSCALL", "Execute a system call", "syscall [code]", CMD_METHOD_SYSCALL };
-static const cli_cmd_t CMD_RUNEXT       = { "RUNEXT", "Executable an external x86 program", "runext [path] [args]", CMD_METHOD_RUNEXT };
 
 static const cli_cmd_t CMD_LS           = { "LS", "List contents of specified directory", "ls [path]", CMD_METHOD_LS };
 static const cli_cmd_t CMD_VIEW         = { "VIEW", "View contents of specified file", "view [-t : text, -b : binary] [path]", CMD_METHOD_VIEW };

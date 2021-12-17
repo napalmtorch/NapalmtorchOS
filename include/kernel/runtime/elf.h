@@ -50,5 +50,5 @@ typedef struct
 	uint32_t p_align;
 } elf_program_header_t;
 
-void elf_init();
+void* elf_map_methods();
 uint8_t elf_start(uint8_t* buffer, uint32_t buffer_size, elf_priv_data* priv);

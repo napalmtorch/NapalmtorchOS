@@ -32,7 +32,7 @@ void vesa_probe()
     vesa_info_t* info_ptr = (vesa_info_t*)0x80000;
     memcpy(&vesa_info, info_ptr, sizeof(vesa_info_t));
 
-    paging_map_virtual_to_phys(32 * 1024 * 1024, vesa_mode_info.physical_base);
+    paging_map(32 * 1024 * 1024, vesa_mode_info.physical_base);
 
     //registers16_t regs;
     //regs.AX = 0x4F00;
